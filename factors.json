@@ -1,0 +1,597 @@
+{
+  "sku_factors": {
+    "Coriander Leaves Bunch": {
+      "festivals_demand": [
+        [
+          "Ramzan/Eid",
+          "High \u2014 biryani garnish & chutneys"
+        ],
+        [
+          "Wedding season May-Jun",
+          "Med"
+        ]
+      ],
+      "weather": "Highly heat-sensitive. Apr-Jun yield drops 25-35%. Top-icing & cold chain non-negotiable.",
+      "harvest_origin": [
+        "Karnataka peri-urban (Hosakote, Chikkaballapur)",
+        "Andhra Pradesh (Anantapur)"
+      ],
+      "monsoon_impact": "Pre-monsoon (May): supply tight. Monsoon (Jun-Sep): bunch quality drops, fungal risk.",
+      "disruption": [
+        "Wilting in transit if break in cold chain >2hrs",
+        "Daily-source SKU \u2014 no buffer stock"
+      ],
+      "fuel_sensitivity": "High \u2014 daily multi-trip from peri-urban farms"
+    },
+    "Banana Robusta": {
+      "festivals_demand": [
+        [
+          "Eid al-Adha (May 27)",
+          "Med"
+        ],
+        [
+          "Ganga Dussehra",
+          "Low"
+        ],
+        [
+          "Daily pooja staple",
+          "Constant"
+        ]
+      ],
+      "weather": "Heat-tolerant. Pre-monsoon ripening accelerates \u2014 DC ripening must be staggered.",
+      "harvest_origin": [
+        "Tamil Nadu (Theni, Trichy)",
+        "Andhra Pradesh (Kadapa, Anantapur)",
+        "Maharashtra (Jalgaon)"
+      ],
+      "monsoon_impact": "Cyclones in TN/AP coast disrupt rake movement. Monitor IMD South Peninsula bulletins.",
+      "disruption": [
+        "Cyclone risk Apr-Jun in Bay of Bengal",
+        "TN Trichy harvest dip Jul-Aug"
+      ],
+      "fuel_sensitivity": "Med \u2014 long-haul truck from TN/AP, diesel exposure"
+    },
+    "Tomato Natti / Local": {
+      "festivals_demand": [
+        [
+          "Wedding season May-Jun",
+          "High \u2014 sambar/rasam staple"
+        ],
+        [
+          "Eid",
+          "Med"
+        ]
+      ],
+      "weather": "Pre-monsoon heat causes fruit-drop. May-Jun = lean season. Prices typically peak.",
+      "harvest_origin": [
+        "Karnataka (Kolar, Chikkaballapur, Hosakote)",
+        "Andhra Pradesh (Madanapalle)"
+      ],
+      "monsoon_impact": "Late monsoon flooding (Sep-Oct) destroys Kolar belt. Plan buffer Aug.",
+      "disruption": [
+        "Kolar mandi strikes (rare but high-impact)",
+        "Madanapalle price arbitrage swings"
+      ],
+      "fuel_sensitivity": "Low \u2014 short-haul (60-100km)"
+    },
+    "Curry leaves": {
+      "festivals_demand": [
+        [
+          "Daily SI cooking staple",
+          "Constant"
+        ],
+        [
+          "Ugadi (Mar)",
+          "Med \u2014 past"
+        ]
+      ],
+      "weather": "Hardy. Mild dip in peak summer.",
+      "harvest_origin": [
+        "Karnataka peri-urban",
+        "Tamil Nadu (Salem belt)"
+      ],
+      "monsoon_impact": "Generally robust through monsoon.",
+      "disruption": [
+        "Pest outbreak risk (whitefly) May-Jul"
+      ],
+      "fuel_sensitivity": "Low"
+    },
+    "Potato": {
+      "festivals_demand": [
+        [
+          "Wedding season May-Jun",
+          "High"
+        ],
+        [
+          "Eid al-Adha",
+          "High \u2014 biryani"
+        ]
+      ],
+      "weather": "Cold-storage commodity. May-Jun pulls from Punjab/UP cold storage \u2014 quality declines.",
+      "harvest_origin": [
+        "Punjab (Jalandhar) cold storage",
+        "UP (Agra/Hathras)",
+        "West Bengal",
+        "Karnataka (Hassan rabi)"
+      ],
+      "monsoon_impact": "Cold-storage dependence Jul-Oct. Storage rot risk if power outages.",
+      "disruption": [
+        "Cold storage tariff hikes",
+        "Punjab rake disruption",
+        "CIPC sprout-control phase-out"
+      ],
+      "fuel_sensitivity": "High \u2014 long-haul rail+road from Punjab/UP"
+    },
+    "Banana Elaichi": {
+      "festivals_demand": [
+        [
+          "Eid",
+          "Med"
+        ],
+        [
+          "Premium daily",
+          "Constant"
+        ]
+      ],
+      "weather": "Heat-tolerant. Smaller acreage = thinner supply buffer.",
+      "harvest_origin": [
+        "Tamil Nadu (Theni)",
+        "Karnataka (Chamarajanagar)"
+      ],
+      "monsoon_impact": "Niche varietal \u2014 Cauvery basin disputes can affect supply.",
+      "disruption": [
+        "Limited vendor base (3) = vendor concentration risk"
+      ],
+      "fuel_sensitivity": "Med"
+    },
+    "Onion": {
+      "festivals_demand": [
+        [
+          "Wedding season",
+          "Very High"
+        ],
+        [
+          "Eid",
+          "Very High"
+        ],
+        [
+          "Ramzan",
+          "High"
+        ]
+      ],
+      "weather": "Maharashtra unseasonal rain = price shock. Pre-monsoon = peak rabi outflow.",
+      "harvest_origin": [
+        "Maharashtra (Nashik, Lasalgaon \u2014 Asia's largest mandi)",
+        "Karnataka (Bagalkot, Gadag)",
+        "Madhya Pradesh"
+      ],
+      "monsoon_impact": "Jul-Sep storage rot risk (rabi). Kharif (Oct-Dec) at risk if heavy rain.",
+      "disruption": [
+        "Govt export bans (recent precedent)",
+        "NAFED MSP procurement",
+        "Lasalgaon strikes",
+        "MEP changes"
+      ],
+      "fuel_sensitivity": "High \u2014 long-haul from Maharashtra"
+    },
+    "Coconut": {
+      "festivals_demand": [
+        [
+          "Wedding season May-Jun",
+          "Very High"
+        ],
+        [
+          "Akshaya Tritiya",
+          "High \u2014 past"
+        ],
+        [
+          "Vat Savitri",
+          "Med"
+        ],
+        [
+          "Daily pooja",
+          "Constant"
+        ]
+      ],
+      "weather": "TN/Kerala cyclones disrupt supply. Drought-resilient but yield 12-month lag.",
+      "harvest_origin": [
+        "Tamil Nadu (Pollachi, Coimbatore)",
+        "Kerala",
+        "Karnataka (Tumkur, Hassan)",
+        "Andhra Pradesh (East Godavari)"
+      ],
+      "monsoon_impact": "SW monsoon onset (Jun) drives wedding-coconut demand spike vs supply lag.",
+      "disruption": [
+        "Pollachi mandi strikes",
+        "Cauvery water dispute",
+        "Diesel price impact on long-haul",
+        "Cyclone Burevi/Tauktae-class events"
+      ],
+      "fuel_sensitivity": "Very High \u2014 Pollachi to Bangalore 350km+"
+    },
+    "Mint / Pudina Leaves": {
+      "festivals_demand": [
+        [
+          "Ramzan",
+          "Very High \u2014 iftar"
+        ],
+        [
+          "Eid",
+          "High"
+        ],
+        [
+          "Summer chutneys",
+          "Constant"
+        ]
+      ],
+      "weather": "Extremely heat-sensitive. May-Jun yield drops 30-40%. Wilts in transit.",
+      "harvest_origin": [
+        "Karnataka peri-urban (Hosakote)",
+        "Andhra Pradesh"
+      ],
+      "monsoon_impact": "Fungal rot risk. Cold chain mandatory.",
+      "disruption": [
+        "Daily-source \u2014 no buffer",
+        "Pre-monsoon supply gap"
+      ],
+      "fuel_sensitivity": "High"
+    },
+    "Drumstick": {
+      "festivals_demand": [
+        [
+          "Sambar staple",
+          "Constant"
+        ],
+        [
+          "Wedding season",
+          "High"
+        ]
+      ],
+      "weather": "\u26a0 FLAG: Mar 8,279 vs Jan 401 (20x). Likely seasonal harvest peak Mar-Jun in TN.",
+      "harvest_origin": [
+        "Tamil Nadu (Dindigul, Theni \u2014 99.7% of supply)",
+        "Karnataka (limited)"
+      ],
+      "monsoon_impact": "Post-monsoon Sep-Oct lull. Peak Mar-Jun aligns with wedding sambar demand.",
+      "disruption": [
+        "TN single-state dependence \u2014 Cauvery dispute, TN bandhs",
+        "Cyclone risk on TN coast"
+      ],
+      "fuel_sensitivity": "Very High \u2014 TN-only supply, 400km+ haul"
+    },
+    "Tomato Hybrid": {
+      "festivals_demand": [
+        [
+          "Wedding May-Jun",
+          "High"
+        ],
+        [
+          "Eid",
+          "High"
+        ]
+      ],
+      "weather": "Same as Natti \u2014 pre-monsoon fruit-drop.",
+      "harvest_origin": [
+        "Karnataka (Kolar, Chikkaballapur)",
+        "Andhra Pradesh (Madanapalle)",
+        "Maharashtra"
+      ],
+      "monsoon_impact": "Sep-Oct flooding disruption. 2024 Kolar floods reference.",
+      "disruption": [
+        "Madanapalle vs Kolar arbitrage",
+        "NEH-belt entry of hybrid varieties"
+      ],
+      "fuel_sensitivity": "Low-Med"
+    },
+    "Cucumber Salad/Hybrid/Green": {
+      "festivals_demand": [
+        [
+          "Wedding salads",
+          "High May-Jun"
+        ],
+        [
+          "Iftar salads",
+          "High Ramzan"
+        ]
+      ],
+      "weather": "Heat-tolerant. Stable through summer.",
+      "harvest_origin": [
+        "Karnataka (Hosakote, Chikkaballapur)"
+      ],
+      "monsoon_impact": "Mild \u2014 water-intensive crop benefits from monsoon.",
+      "disruption": [
+        "Vendor concentration: 2 vendors only"
+      ],
+      "fuel_sensitivity": "Low"
+    },
+    "Spinach Leaves": {
+      "festivals_demand": [
+        [
+          "Lent/Sankashti",
+          "Med"
+        ],
+        [
+          "Daily greens",
+          "Constant"
+        ]
+      ],
+      "weather": "Cool-season crop. May-Jun yields halve. Peak Oct-Feb.",
+      "harvest_origin": [
+        "Karnataka peri-urban (Hosakote)",
+        "Punjab (winter)"
+      ],
+      "monsoon_impact": "Fungal rot risk. Ethylene-sensitive.",
+      "disruption": [
+        "Daily-source SKU",
+        "Summer supply gap May-Jun"
+      ],
+      "fuel_sensitivity": "Med"
+    },
+    "Methi Leaves": {
+      "festivals_demand": [
+        [
+          "Daily NI cooking",
+          "Constant"
+        ],
+        [
+          "Wedding parathas",
+          "Med"
+        ]
+      ],
+      "weather": "Cool-season. Summer yields drop 30%.",
+      "harvest_origin": [
+        "Karnataka peri-urban",
+        "Rajasthan (winter peak)"
+      ],
+      "monsoon_impact": "Yield recovers post-monsoon.",
+      "disruption": [
+        "Daily-source"
+      ],
+      "fuel_sensitivity": "Med"
+    },
+    "Namdhari Watermelon, Loose": {
+      "festivals_demand": [
+        [
+          "Summer peak Mar-May",
+          "Very High"
+        ],
+        [
+          "Ramzan iftar",
+          "Very High"
+        ]
+      ],
+      "weather": "Pure summer SKU. May = peak. Jun onward demand collapses with monsoon.",
+      "harvest_origin": [
+        "Karnataka (Bagalkot, Raichur)",
+        "Andhra Pradesh",
+        "Maharashtra (Solapur)"
+      ],
+      "monsoon_impact": "Demand collapses with monsoon onset. Procurement must taper Jun.",
+      "disruption": [
+        "Heat damage in transit",
+        "Heavy SKU \u2014 fuel cost high",
+        "Hailstorms (rare)"
+      ],
+      "fuel_sensitivity": "Very High \u2014 2kg/piece, weight-sensitive"
+    },
+    "Sweet Corn": {
+      "festivals_demand": [
+        [
+          "Monsoon snacks",
+          "High Jul-Sep"
+        ],
+        [
+          "Movie/cafe channels",
+          "Constant"
+        ]
+      ],
+      "weather": "Pre-monsoon peak harvest. Mar-Jun strong supply.",
+      "harvest_origin": [
+        "Karnataka (Davangere, Chitradurga)",
+        "Tamil Nadu"
+      ],
+      "monsoon_impact": "Peak demand DURING monsoon \u2014 Jul-Sep is upside.",
+      "disruption": [
+        "Stem borer pest May-Jul",
+        "Karnataka-Maharashtra arbitrage"
+      ],
+      "fuel_sensitivity": "Med"
+    },
+    "Papaya": {
+      "festivals_demand": [
+        [
+          "Daily fruit",
+          "Constant"
+        ]
+      ],
+      "weather": "Year-round. Heat-tolerant.",
+      "harvest_origin": [
+        "Karnataka (Kolar, Chikkaballapur)",
+        "Andhra Pradesh",
+        "Tamil Nadu"
+      ],
+      "monsoon_impact": "Ringspot virus risk Jul-Sep.",
+      "disruption": [
+        "Ringspot virus outbreaks",
+        "Single-vendor location concentration"
+      ],
+      "fuel_sensitivity": "Low"
+    },
+    "Mushroom": {
+      "festivals_demand": [
+        [
+          "Premium/cafe channel",
+          "Constant"
+        ],
+        [
+          "Lent (vegetarian)",
+          "Med"
+        ]
+      ],
+      "weather": "Climate-controlled \u2014 least weather-exposed. Summer cooling cost up.",
+      "harvest_origin": [
+        "Karnataka (Hosakote \u2014 controlled-environment)",
+        "Himachal Pradesh"
+      ],
+      "monsoon_impact": "Mostly insulated.",
+      "disruption": [
+        "Power outages at growing facility",
+        "Cold chain critical"
+      ],
+      "fuel_sensitivity": "Low"
+    },
+    "Carrot Ooty": {
+      "festivals_demand": [
+        [
+          "Wedding salads",
+          "High May-Jun"
+        ],
+        [
+          "Daily",
+          "Constant"
+        ]
+      ],
+      "weather": "High-altitude origin (Ooty 2,200m). Monsoon = peak season.",
+      "harvest_origin": [
+        "Tamil Nadu (Ooty, Nilgiris)",
+        "Karnataka (limited Hassan)"
+      ],
+      "monsoon_impact": "Nilgiris landslides Jul-Sep can cut off supply.",
+      "disruption": [
+        "Single-vendor risk",
+        "Nilgiris landslides",
+        "Ooty road closures"
+      ],
+      "fuel_sensitivity": "High \u2014 300km+ from Ooty"
+    },
+    "Chilli Green (Small)": {
+      "festivals_demand": [
+        [
+          "Daily SI staple",
+          "Constant"
+        ],
+        [
+          "Pickle season May-Jun",
+          "High"
+        ]
+      ],
+      "weather": "Heat-tolerant.",
+      "harvest_origin": [
+        "Karnataka (Bidar, Bagalkot)",
+        "Andhra Pradesh (Guntur)"
+      ],
+      "monsoon_impact": "Thrips/mites May-Jul",
+      "disruption": [
+        "Guntur arbitrage",
+        "Pesticide residue rejections"
+      ],
+      "fuel_sensitivity": "Med"
+    }
+  },
+  "festival_cal": [
+    {
+      "name": "Akshaya Tritiya",
+      "date": "2026-04-19",
+      "impact": "Coconut, Banana",
+      "level": "high"
+    },
+    {
+      "name": "Buddha Purnima",
+      "date": "2026-05-21",
+      "impact": "Banana, Coconut, Fruits",
+      "level": "med"
+    },
+    {
+      "name": "Eid al-Adha (Bakrid)",
+      "date": "2026-05-27",
+      "impact": "Onion, Tomato, Mint, Coriander, Banana",
+      "level": "very_high"
+    },
+    {
+      "name": "Vat Savitri",
+      "date": "2026-06-04",
+      "impact": "Banana, Coconut",
+      "level": "med"
+    },
+    {
+      "name": "Ganga Dussehra",
+      "date": "2026-06-14",
+      "impact": "Coconut, Banana",
+      "level": "med"
+    },
+    {
+      "name": "Ashadi Ekadashi",
+      "date": "2026-07-15",
+      "impact": "Banana, Coconut",
+      "level": "med"
+    },
+    {
+      "name": "Onam (Kerala)",
+      "date": "2026-09-08",
+      "impact": "Banana, Coconut, Vegetables (Sadya)",
+      "level": "high"
+    },
+    {
+      "name": "Ganesh Chaturthi",
+      "date": "2026-09-14",
+      "impact": "Banana, Coconut, Vegetables",
+      "level": "very_high"
+    },
+    {
+      "name": "Navratri (Day 1)",
+      "date": "2026-10-11",
+      "impact": "Potato, Banana, Coconut",
+      "level": "very_high"
+    },
+    {
+      "name": "Diwali",
+      "date": "2026-11-08",
+      "impact": "All vegetables, Coconut, Banana",
+      "level": "very_high"
+    },
+    {
+      "name": "Karnataka Wedding Season",
+      "date": "2026-05-01_to_2026-06-15",
+      "impact": "Onion, Tomato, Coconut, Potato, Carrot",
+      "level": "very_high"
+    }
+  ],
+  "weather_cal": [
+    {
+      "period": "May 2026",
+      "desc": "Pre-monsoon heat peak (35-38\u00b0C). Greens yield \u219325-35%. Cold chain critical."
+    },
+    {
+      "period": "Jun 1-10 2026",
+      "desc": "SW Monsoon onset over Karnataka coast (~Jun 5). Watermelon demand drops sharply."
+    },
+    {
+      "period": "Jun-Sep 2026",
+      "desc": "SW Monsoon active. Tomato Kolar belt flood risk Sep-Oct. Cyclone risk on TN/AP coast affects Banana, Coconut, Drumstick rakes."
+    },
+    {
+      "period": "Jul-Aug 2026",
+      "desc": "Heavy rain windows. Peri-urban greens fungal risk. Onion storage rot risk in MH."
+    },
+    {
+      "period": "Aug-Sep 2026",
+      "desc": "Nilgiris landslide window \u2014 Carrot Ooty supply at risk."
+    }
+  ],
+  "loc_state": {
+    "Hosakote": "Karnataka",
+    "Kolar": "Karnataka",
+    "Chikkaballapur": "Karnataka",
+    "Malur": "Karnataka",
+    "Malur/Sulibele": "Karnataka",
+    "Chimasandra": "Karnataka",
+    "Nelamangala": "Karnataka",
+    "Goravigere": "Karnataka",
+    "Safal": "Karnataka (Safal-Bangalore)",
+    "Near Safal": "Karnataka",
+    "City market": "Karnataka (Bangalore Mandi)",
+    "Binni mill ": "Karnataka (Binny Mills)",
+    "Huskur Market": "Karnataka (Hoskote/Huskur)",
+    "TN": "Tamil Nadu"
+  }
+}

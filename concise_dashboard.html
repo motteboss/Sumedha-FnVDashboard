@@ -1,0 +1,437 @@
+<!doctype html><html><head>
+<meta charset="utf-8"><title>FnV Top 20 — Demand vs Supply (May 2026)</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f4f6f8; color: #1c2530; padding: 18px; line-height: 1.45; }
+.wrap { max-width: 1480px; margin: 0 auto; }
+header { background: linear-gradient(135deg, #0d3b66, #1f6e43); color: white; padding: 20px 24px; border-radius: 12px; margin-bottom: 16px; }
+header h1 { font-size: 22px; margin-bottom: 4px; }
+header .sub { font-size: 13px; opacity: 0.9; }
+.legend { display: flex; gap: 14px; margin-top: 10px; flex-wrap: wrap; font-size: 11.5px; align-items: center; }
+.legend span { background: rgba(255,255,255,0.13); padding: 4px 10px; border-radius: 12px; }
+.legend a.refs-link { background: #d18c00; color: white; text-decoration: none; font-weight: 600; padding: 5px 12px; border-radius: 14px; }
+.legend a.refs-link:hover { background: #b07700; }
+.methodology { background: white; border: 1px solid #e3e8ee; border-radius: 10px; padding: 14px 18px; margin-bottom: 14px; font-size: 12px; color: #3a4654; }
+.methodology h3 { font-size: 12px; color: #0d3b66; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+.methodology .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.methodology .row .col h4 { font-size: 11px; margin-bottom: 4px; }
+.methodology .row .col h4.D { color: #11824a; }
+.methodology .row .col h4.M { color: #d18c00; }
+.methodology ul { padding-left: 16px; line-height: 1.55; }
+.methodology li { margin: 1px 0; }
+.toolbar { background: white; padding: 10px 16px; border-radius: 10px; border: 1px solid #e3e8ee; margin-bottom: 14px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 13px; }
+.toolbar select { padding: 5px 10px; border: 1px solid #d4dae2; border-radius: 5px; font-size: 12px; }
+.toolbar label { color: #6b7989; font-size: 12px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; }
+.box { background: white; border: 1px solid #e3e8ee; border-radius: 10px; padding: 14px 15px; transition: box-shadow .15s; }
+.box:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+.box-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; margin-bottom: 10px; }
+.box-head .name { font-size: 14px; font-weight: 600; line-height: 1.25; color: #1c2530; }
+.box-head .rank { background: #0d3b66; color: white; font-size: 10px; padding: 2px 7px; border-radius: 8px; font-weight: 600; min-width: 24px; text-align: center; }
+.cat-pill { display: inline-block; font-size: 9px; padding: 1px 6px; border-radius: 6px; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600; }
+.cat-pill.veg { background: #e6f4ea; color: #1c6e3f; }
+.cat-pill.fr { background: #fdecea; color: #a8392c; }
+.cat-pill.hg { background: #e7f1f9; color: #1a5483; }
+.cat-pill.ot { background: #f2eafd; color: #5a3d92; }
+.metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.m { padding: 8px 10px; border-radius: 7px; }
+.m .l { font-size: 9.5px; color: #6b7989; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; font-weight: 600; }
+.m .v { font-size: 18px; font-weight: 700; line-height: 1.1; }
+.m.dem { background: #eef4fb; }
+.m.dem .l { color: #155e8a; }
+.m.sup { background: #eef7f1; }
+.m.sup .l { color: #1f6e43; }
+.up { color: #11824a; }
+.down { color: #c0392b; }
+.flat { color: #7d8a99; }
+.factors { font-size: 11.5px; color: #3a4654; line-height: 1.55; padding-top: 8px; border-top: 1px dashed #e3e8ee; }
+.factors div { padding: 2px 0; }
+.badge { display: inline-block; font-size: 8.5px; padding: 1px 5px; border-radius: 3px; font-weight: 700; vertical-align: middle; margin-left: 5px; letter-spacing: 0.4px; }
+.badge.D { background: #11824a; color: white; }
+.badge.M { background: #d18c00; color: white; }
+.badge.DM { background: linear-gradient(90deg,#11824a 50%,#d18c00 50%); color: white; }
+sup { font-size: 9px; }
+sup a.cite { color: #155e8a; text-decoration: none; padding: 0 2px; border-radius: 2px; background: #ecf2f8; margin: 0 1px; font-weight: 600; }
+sup a.cite:hover { background: #d18c00; color: white; }
+footer { text-align: center; font-size: 11px; color: #7d8a99; margin-top: 22px; }
+</style></head><body>
+<div class="wrap">
+<header>
+    <h1>FnV Top 20 SKUs — 4-Week Forecast (May 4 – May 31, 2026)</h1>
+    <div class="sub">Demand: Bangalore consumption · Supply: Pan-India vendor sources · % change vs trailing 4-week average · Harvard-style citations linked below</div>
+    <div class="legend">
+        <span>📍 Demand: Bangalore</span>
+        <span>🚛 Supply: Pan-India</span>
+        <span>🎉 Eid al-Adha · May 27<sup><a class="cite" href="references.html#ref5" target="_blank">5</a></sup></span>
+        <span>💍 Wedding season · May–Jun</span>
+        <span>🌧 SW Monsoon onset · ~Jun 1<sup><a class="cite" href="references.html#ref3" target="_blank">3</a></sup></span>
+        <span>📊 Avg demand ▲ +49.6% · supply ▲ +61.7%</span>
+        <span><span class="badge D">D</span> Data · <span class="badge M">M</span> Modelled · <span class="badge DM">D+M</span> Mixed</span>
+        <a class="refs-link" href="references.html" target="_blank">📚 View References →</a>
+    </div>
+</header>
+
+<div class="methodology">
+    <h3>What's Data vs Modelled (full provenance in references)</h3>
+    <div class="row">
+      <div class="col">
+        <h4 class="D">🟢 Real data (from your files or verified sources)</h4>
+        <ul>
+          <li>Top 20 SKUs, ranking, monthly volumes <sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup></li>
+          <li>Supply history — vendor indent Jan-Apr 2026 <sup><a class="cite" href="references.html#ref2" target="_blank">2</a></sup></li>
+          <li>Festival dates <sup><a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref6" target="_blank">6</a></sup>; Monsoon onset <sup><a class="cite" href="references.html#ref3" target="_blank">3</a>,<a class="cite" href="references.html#ref4" target="_blank">4</a></sup></li>
+          <li>Lasalgaon onion hub <sup><a class="cite" href="references.html#ref7" target="_blank">7</a>,<a class="cite" href="references.html#ref8" target="_blank">8</a></sup>; Pollachi coconut hub <sup><a class="cite" href="references.html#ref12" target="_blank">12</a></sup>; TN drumstick share <sup><a class="cite" href="references.html#ref13" target="_blank">13</a>,<a class="cite" href="references.html#ref14" target="_blank">14</a></sup></li>
+          <li>Onion export ban history <sup><a class="cite" href="references.html#ref9" target="_blank">9</a>,<a class="cite" href="references.html#ref10" target="_blank">10</a>,<a class="cite" href="references.html#ref11" target="_blank">11</a></sup></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4 class="M">🟠 Modelled / domain-knowledge layer</h4>
+        <ul>
+          <li><b>Demand %</b> — monthly demand split evenly to weeks; April extrapolated from March <sup><a class="cite" href="references.html#ref1" target="_blank">1</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup></li>
+          <li><b>Supply forecast</b> — trailing indent × risk multiplier <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup></li>
+          <li>Pre-monsoon yield drops, pest cycles, fuel sensitivity, Nilgiris landslide risk, ringspot virus — all industry priors <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></li>
+          <li>To calibrate: wire Agmarknet daily mandi feed <sup><a class="cite" href="references.html#ref16" target="_blank">16</a></sup>, weekly POS data, 12+ months history</li>
+        </ul>
+      </div>
+    </div>
+</div>
+
+<div class="toolbar">
+    <label>Category:</label>
+    <select id="fc" onchange="ap()"><option value="">All</option><option>Vegetables</option><option>Fruits</option><option>Herbs/Greens</option><option>Others</option></select>
+    <label>Tier:</label>
+    <select id="ft" onchange="ap()"><option value="">All</option><option>High</option><option>Medium</option></select>
+    <label>Sort:</label>
+    <select id="fs" onchange="ap()"><option value="rank">Rank</option><option value="dd">Demand growth (high→low)</option><option value="da">Demand growth (low→high)</option><option value="sd">Supply growth (high→low)</option><option value="sa">Supply growth (low→high)</option></select>
+</div>
+
+<div class="grid" id="g">
+
+    <div class="box" data-cat="Herbs/Greens" data-tier="High" data-dem="21.9" data-sup="25.3">
+        <div class="box-head">
+            <div>
+                <div class="name">Coriander Leaves Bunch<sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup> <span class="badge D" title="Real data — from SKU Decision Matrix">D</span></div>
+                <div class="cat-pill hg">Herbs/Greens</div>
+            </div>
+            <div class="rank">#1</div>
+        </div>
+        <div class="metrics">
+            <div class="m dem"><div class="l">Demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a>,<a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge M" title="Modelled from monthly demand × festival/seasonality multiplier">M</span></div><div class="v up">▲ +21.9%</div></div>
+            <div class="m sup"><div class="l">Supply <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge DM" title="Mixed: real vendor indent history + modelled forecast">D+M</span></div><div class="v up">▲ +25.3%</div></div>
+        </div>
+        <div class="factors"><div>🎉 Eid al-Adha (May 27) — biryani/chutney spike <sup><a class="cite" href="references.html#ref5" target="_blank">5</a></sup></div><div>☀️ Pre-monsoon heat ↓ yield 25-35% <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div><div>🚛 Daily-source from Hosakote/Chikkaballapur <sup><a class="cite" href="references.html#ref2" target="_blank">2</a></sup></div></div>
+    </div>
+    
+    <div class="box" data-cat="Fruits" data-tier="High" data-dem="70.6" data-sup="53.8">
+        <div class="box-head">
+            <div>
+                <div class="name">Banana Robusta<sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup> <span class="badge D" title="Real data — from SKU Decision Matrix">D</span></div>
+                <div class="cat-pill fr">Fruits</div>
+            </div>
+            <div class="rank">#2</div>
+        </div>
+        <div class="metrics">
+            <div class="m dem"><div class="l">Demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a>,<a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge M" title="Modelled from monthly demand × festival/seasonality multiplier">M</span></div><div class="v up">▲ +70.6%</div></div>
+            <div class="m sup"><div class="l">Supply <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge DM" title="Mixed: real vendor indent history + modelled forecast">D+M</span></div><div class="v up">▲ +53.8%</div></div>
+        </div>
+        <div class="factors"><div>🎉 Wedding season + Eid demand surge <sup><a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div><div>🌪 Cyclone risk on TN/AP coast <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div><div>📍 TN (Theni/Trichy) + AP (Kadapa) supply <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div></div>
+    </div>
+    
+    <div class="box" data-cat="Vegetables" data-tier="High" data-dem="71.2" data-sup="46.5">
+        <div class="box-head">
+            <div>
+                <div class="name">Tomato Natti / Local<sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup> <span class="badge D" title="Real data — from SKU Decision Matrix">D</span></div>
+                <div class="cat-pill veg">Vegetables</div>
+            </div>
+            <div class="rank">#3</div>
+        </div>
+        <div class="metrics">
+            <div class="m dem"><div class="l">Demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a>,<a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge M" title="Modelled from monthly demand × festival/seasonality multiplier">M</span></div><div class="v up">▲ +71.2%</div></div>
+            <div class="m sup"><div class="l">Supply <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge DM" title="Mixed: real vendor indent history + modelled forecast">D+M</span></div><div class="v up">▲ +46.5%</div></div>
+        </div>
+        <div class="factors"><div>💍 Wedding sambar/rasam staple May-Jun <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div><div>☀️ Pre-monsoon fruit-drop ↓ Kolar yield <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div><div>📍 Kolar + Madanapalle (AP) <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div></div>
+    </div>
+    
+    <div class="box" data-cat="Herbs/Greens" data-tier="High" data-dem="21.4" data-sup="26.5">
+        <div class="box-head">
+            <div>
+                <div class="name">Curry leaves<sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup> <span class="badge D" title="Real data — from SKU Decision Matrix">D</span></div>
+                <div class="cat-pill hg">Herbs/Greens</div>
+            </div>
+            <div class="rank">#4</div>
+        </div>
+        <div class="metrics">
+            <div class="m dem"><div class="l">Demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a>,<a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge M" title="Modelled from monthly demand × festival/seasonality multiplier">M</span></div><div class="v up">▲ +21.4%</div></div>
+            <div class="m sup"><div class="l">Supply <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge DM" title="Mixed: real vendor indent history + modelled forecast">D+M</span></div><div class="v up">▲ +26.5%</div></div>
+        </div>
+        <div class="factors"><div>🍛 Daily SI cooking — constant demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup></div><div>🐛 Whitefly pest risk May-Jul <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div><div>📍 Karnataka peri-urban + Salem (TN) <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div></div>
+    </div>
+    
+    <div class="box" data-cat="Vegetables" data-tier="High" data-dem="36.8" data-sup="63.7">
+        <div class="box-head">
+            <div>
+                <div class="name">Potato<sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup> <span class="badge D" title="Real data — from SKU Decision Matrix">D</span></div>
+                <div class="cat-pill veg">Vegetables</div>
+            </div>
+            <div class="rank">#5</div>
+        </div>
+        <div class="metrics">
+            <div class="m dem"><div class="l">Demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a>,<a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge M" title="Modelled from monthly demand × festival/seasonality multiplier">M</span></div><div class="v up">▲ +36.8%</div></div>
+            <div class="m sup"><div class="l">Supply <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge DM" title="Mixed: real vendor indent history + modelled forecast">D+M</span></div><div class="v up">▲ +63.7%</div></div>
+        </div>
+        <div class="factors"><div>💍 Wedding + Eid biryani — Very High pull <sup><a class="cite" href="references.html#ref5" target="_blank">5</a></sup></div><div>❄️ Punjab/UP cold storage outflow tail <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div><div>⚠️ Cold-storage tariff / rake disruption risk <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div></div>
+    </div>
+    
+    <div class="box" data-cat="Vegetables" data-tier="High" data-dem="17.7" data-sup="59.2">
+        <div class="box-head">
+            <div>
+                <div class="name">Onion<sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup> <span class="badge D" title="Real data — from SKU Decision Matrix">D</span></div>
+                <div class="cat-pill veg">Vegetables</div>
+            </div>
+            <div class="rank">#6</div>
+        </div>
+        <div class="metrics">
+            <div class="m dem"><div class="l">Demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a>,<a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge M" title="Modelled from monthly demand × festival/seasonality multiplier">M</span></div><div class="v up">▲ +17.7%</div></div>
+            <div class="m sup"><div class="l">Supply <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge DM" title="Mixed: real vendor indent history + modelled forecast">D+M</span></div><div class="v up">▲ +59.2%</div></div>
+        </div>
+        <div class="factors"><div>💍 Wedding + Eid + Ramzan — Very High <sup><a class="cite" href="references.html#ref5" target="_blank">5</a></sup></div><div>📍 Maharashtra Nashik/Lasalgaon dominant <sup><a class="cite" href="references.html#ref7" target="_blank">7</a>,<a class="cite" href="references.html#ref8" target="_blank">8</a></sup></div><div>⚠️ Govt export ban / NAFED MSP risk <sup><a class="cite" href="references.html#ref9" target="_blank">9</a>,<a class="cite" href="references.html#ref10" target="_blank">10</a>,<a class="cite" href="references.html#ref11" target="_blank">11</a></sup></div></div>
+    </div>
+    
+    <div class="box" data-cat="Vegetables" data-tier="High" data-dem="58.9" data-sup="47.3">
+        <div class="box-head">
+            <div>
+                <div class="name">Coconut<sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup> <span class="badge D" title="Real data — from SKU Decision Matrix">D</span></div>
+                <div class="cat-pill veg">Vegetables</div>
+            </div>
+            <div class="rank">#7</div>
+        </div>
+        <div class="metrics">
+            <div class="m dem"><div class="l">Demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a>,<a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge M" title="Modelled from monthly demand × festival/seasonality multiplier">M</span></div><div class="v up">▲ +58.9%</div></div>
+            <div class="m sup"><div class="l">Supply <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge DM" title="Mixed: real vendor indent history + modelled forecast">D+M</span></div><div class="v up">▲ +47.3%</div></div>
+        </div>
+        <div class="factors"><div>💍 Wedding + Vat Savitri (Jun 4) spike <sup><a class="cite" href="references.html#ref5" target="_blank">5</a></sup></div><div>📍 TN Pollachi + Kerala — 350km+ haul <sup><a class="cite" href="references.html#ref12" target="_blank">12</a></sup></div><div>⛽ Very High fuel sensitivity <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div></div>
+    </div>
+    
+    <div class="box" data-cat="Fruits" data-tier="High" data-dem="68.1" data-sup="52.4">
+        <div class="box-head">
+            <div>
+                <div class="name">Banana Elaichi<sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup> <span class="badge D" title="Real data — from SKU Decision Matrix">D</span></div>
+                <div class="cat-pill fr">Fruits</div>
+            </div>
+            <div class="rank">#8</div>
+        </div>
+        <div class="metrics">
+            <div class="m dem"><div class="l">Demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a>,<a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge M" title="Modelled from monthly demand × festival/seasonality multiplier">M</span></div><div class="v up">▲ +68.1%</div></div>
+            <div class="m sup"><div class="l">Supply <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge DM" title="Mixed: real vendor indent history + modelled forecast">D+M</span></div><div class="v up">▲ +52.4%</div></div>
+        </div>
+        <div class="factors"><div>🎉 Eid + premium daily — steady spike <sup><a class="cite" href="references.html#ref5" target="_blank">5</a></sup></div><div>📍 Niche TN/Karnataka — only 3 vendors <sup><a class="cite" href="references.html#ref2" target="_blank">2</a></sup></div><div>⚠️ Vendor concentration risk <sup><a class="cite" href="references.html#ref2" target="_blank">2</a></sup></div></div>
+    </div>
+    
+    <div class="box" data-cat="Herbs/Greens" data-tier="High" data-dem="26.6" data-sup="26.4">
+        <div class="box-head">
+            <div>
+                <div class="name">Mint / Pudina Leaves<sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup> <span class="badge D" title="Real data — from SKU Decision Matrix">D</span></div>
+                <div class="cat-pill hg">Herbs/Greens</div>
+            </div>
+            <div class="rank">#9</div>
+        </div>
+        <div class="metrics">
+            <div class="m dem"><div class="l">Demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a>,<a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge M" title="Modelled from monthly demand × festival/seasonality multiplier">M</span></div><div class="v up">▲ +26.6%</div></div>
+            <div class="m sup"><div class="l">Supply <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge DM" title="Mixed: real vendor indent history + modelled forecast">D+M</span></div><div class="v up">▲ +26.4%</div></div>
+        </div>
+        <div class="factors"><div>🌙 Ramzan/Eid iftar — Very High pull <sup><a class="cite" href="references.html#ref5" target="_blank">5</a></sup></div><div>☀️ Heat ↓ yield 30-40%, wilts in transit <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div><div>🚛 Daily-source, no buffer <sup><a class="cite" href="references.html#ref2" target="_blank">2</a></sup></div></div>
+    </div>
+    
+    <div class="box" data-cat="Vegetables" data-tier="High" data-dem="64.3" data-sup="40.0">
+        <div class="box-head">
+            <div>
+                <div class="name">Tomato Hybrid<sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup> <span class="badge D" title="Real data — from SKU Decision Matrix">D</span></div>
+                <div class="cat-pill veg">Vegetables</div>
+            </div>
+            <div class="rank">#10</div>
+        </div>
+        <div class="metrics">
+            <div class="m dem"><div class="l">Demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a>,<a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge M" title="Modelled from monthly demand × festival/seasonality multiplier">M</span></div><div class="v up">▲ +64.3%</div></div>
+            <div class="m sup"><div class="l">Supply <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge DM" title="Mixed: real vendor indent history + modelled forecast">D+M</span></div><div class="v up">▲ +40.0%</div></div>
+        </div>
+        <div class="factors"><div>💍 Wedding + Eid demand <sup><a class="cite" href="references.html#ref5" target="_blank">5</a></sup></div><div>☀️ Pre-monsoon fruit-drop <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div><div>📍 Kolar + Madanapalle arbitrage <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div></div>
+    </div>
+    
+    <div class="box" data-cat="Vegetables" data-tier="High" data-dem="25.3" data-sup="7.7">
+        <div class="box-head">
+            <div>
+                <div class="name">Cucumber Salad/Hybrid/Green<sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup> <span class="badge D" title="Real data — from SKU Decision Matrix">D</span></div>
+                <div class="cat-pill veg">Vegetables</div>
+            </div>
+            <div class="rank">#11</div>
+        </div>
+        <div class="metrics">
+            <div class="m dem"><div class="l">Demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a>,<a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge M" title="Modelled from monthly demand × festival/seasonality multiplier">M</span></div><div class="v up">▲ +25.3%</div></div>
+            <div class="m sup"><div class="l">Supply <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge DM" title="Mixed: real vendor indent history + modelled forecast">D+M</span></div><div class="v up">▲ +7.7%</div></div>
+        </div>
+        <div class="factors"><div>🥗 Wedding salad + Iftar demand <sup><a class="cite" href="references.html#ref5" target="_blank">5</a></sup></div><div>☀️ Heat-tolerant, stable supply <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div><div>⚠️ Only 2 vendors — concentration risk <sup><a class="cite" href="references.html#ref2" target="_blank">2</a></sup></div></div>
+    </div>
+    
+    <div class="box" data-cat="Herbs/Greens" data-tier="High" data-dem="-20.9" data-sup="26.0">
+        <div class="box-head">
+            <div>
+                <div class="name">Spinach Leaves<sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup> <span class="badge D" title="Real data — from SKU Decision Matrix">D</span></div>
+                <div class="cat-pill hg">Herbs/Greens</div>
+            </div>
+            <div class="rank">#12</div>
+        </div>
+        <div class="metrics">
+            <div class="m dem"><div class="l">Demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a>,<a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge M" title="Modelled from monthly demand × festival/seasonality multiplier">M</span></div><div class="v down">▼ -20.9%</div></div>
+            <div class="m sup"><div class="l">Supply <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge DM" title="Mixed: real vendor indent history + modelled forecast">D+M</span></div><div class="v up">▲ +26.0%</div></div>
+        </div>
+        <div class="factors"><div>☀️ Off-peak (cool-season) — yield ↓50% <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div><div>🚛 Daily-source, ethylene-sensitive <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div><div>📍 Karnataka peri-urban only <sup><a class="cite" href="references.html#ref2" target="_blank">2</a></sup></div></div>
+    </div>
+    
+    <div class="box" data-cat="Herbs/Greens" data-tier="High" data-dem="-1.4" data-sup="25.0">
+        <div class="box-head">
+            <div>
+                <div class="name">Methi Leaves<sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup> <span class="badge D" title="Real data — from SKU Decision Matrix">D</span></div>
+                <div class="cat-pill hg">Herbs/Greens</div>
+            </div>
+            <div class="rank">#13</div>
+        </div>
+        <div class="metrics">
+            <div class="m dem"><div class="l">Demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a>,<a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge M" title="Modelled from monthly demand × festival/seasonality multiplier">M</span></div><div class="v flat">▬ -1.4%</div></div>
+            <div class="m sup"><div class="l">Supply <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge DM" title="Mixed: real vendor indent history + modelled forecast">D+M</span></div><div class="v up">▲ +25.0%</div></div>
+        </div>
+        <div class="factors"><div>☀️ Summer dip — yield ↓30% <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div><div>📍 Karnataka + Rajasthan winter belt <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div><div>🚛 Daily cold-room replen <sup><a class="cite" href="references.html#ref2" target="_blank">2</a></sup></div></div>
+    </div>
+    
+    <div class="box" data-cat="Vegetables" data-tier="High" data-dem="10.0" data-sup="62.3">
+        <div class="box-head">
+            <div>
+                <div class="name">Sweet Corn<sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup> <span class="badge D" title="Real data — from SKU Decision Matrix">D</span></div>
+                <div class="cat-pill veg">Vegetables</div>
+            </div>
+            <div class="rank">#14</div>
+        </div>
+        <div class="metrics">
+            <div class="m dem"><div class="l">Demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a>,<a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge M" title="Modelled from monthly demand × festival/seasonality multiplier">M</span></div><div class="v up">▲ +10.0%</div></div>
+            <div class="m sup"><div class="l">Supply <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge DM" title="Mixed: real vendor indent history + modelled forecast">D+M</span></div><div class="v up">▲ +62.3%</div></div>
+        </div>
+        <div class="factors"><div>🌧 Pre-monsoon harvest peak <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div><div>🐛 Stem borer pest May-Jul <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div><div>📍 Karnataka (Davangere/Chitradurga) <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div></div>
+    </div>
+    
+    <div class="box" data-cat="Vegetables" data-tier="High" data-dem="216.7" data-sup="62.8">
+        <div class="box-head">
+            <div>
+                <div class="name">Drumstick<sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup> <span class="badge D" title="Real data — from SKU Decision Matrix">D</span></div>
+                <div class="cat-pill veg">Vegetables</div>
+            </div>
+            <div class="rank">#15</div>
+        </div>
+        <div class="metrics">
+            <div class="m dem"><div class="l">Demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a>,<a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge M" title="Modelled from monthly demand × festival/seasonality multiplier">M</span></div><div class="v up">▲ +216.7%</div></div>
+            <div class="m sup"><div class="l">Supply <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge DM" title="Mixed: real vendor indent history + modelled forecast">D+M</span></div><div class="v up">▲ +62.8%</div></div>
+        </div>
+        <div class="factors"><div>🍛 Wedding sambar staple <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div><div>📍 99.7% TN (Dindigul/Theni) — peak May <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref13" target="_blank">13</a>,<a class="cite" href="references.html#ref14" target="_blank">14</a></sup></div><div>⚠️ Single-state dependence — bandh/Cauvery risk <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div></div>
+    </div>
+    
+    <div class="box" data-cat="Fruits" data-tier="High" data-dem="4.6" data-sup="62.1">
+        <div class="box-head">
+            <div>
+                <div class="name">Papaya<sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup> <span class="badge D" title="Real data — from SKU Decision Matrix">D</span></div>
+                <div class="cat-pill fr">Fruits</div>
+            </div>
+            <div class="rank">#16</div>
+        </div>
+        <div class="metrics">
+            <div class="m dem"><div class="l">Demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a>,<a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge M" title="Modelled from monthly demand × festival/seasonality multiplier">M</span></div><div class="v flat">▬ +4.6%</div></div>
+            <div class="m sup"><div class="l">Supply <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge DM" title="Mixed: real vendor indent history + modelled forecast">D+M</span></div><div class="v up">▲ +62.1%</div></div>
+        </div>
+        <div class="factors"><div>📈 Constant demand year-round <sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup></div><div>🦠 Ringspot virus risk Jul-Sep <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div><div>📍 Kolar/Chikkaballapur + AP <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div></div>
+    </div>
+    
+    <div class="box" data-cat="Others" data-tier="Medium" data-dem="3.3" data-sup="61.6">
+        <div class="box-head">
+            <div>
+                <div class="name">Mushroom<sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup> <span class="badge D" title="Real data — from SKU Decision Matrix">D</span></div>
+                <div class="cat-pill ot">Others</div>
+            </div>
+            <div class="rank">#17</div>
+        </div>
+        <div class="metrics">
+            <div class="m dem"><div class="l">Demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a>,<a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge M" title="Modelled from monthly demand × festival/seasonality multiplier">M</span></div><div class="v flat">▬ +3.3%</div></div>
+            <div class="m sup"><div class="l">Supply <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge DM" title="Mixed: real vendor indent history + modelled forecast">D+M</span></div><div class="v up">▲ +61.6%</div></div>
+        </div>
+        <div class="factors"><div>🥗 Premium/cafe channel steady <sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup></div><div>❄️ Climate-controlled — weather-insulated <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div><div>⚡ Power outage risk at Hosakote facility <sup><a class="cite" href="references.html#ref2" target="_blank">2</a></sup></div></div>
+    </div>
+    
+    <div class="box" data-cat="Vegetables" data-tier="Medium" data-dem="49.9" data-sup="52.9">
+        <div class="box-head">
+            <div>
+                <div class="name">Carrot Ooty<sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup> <span class="badge D" title="Real data — from SKU Decision Matrix">D</span></div>
+                <div class="cat-pill veg">Vegetables</div>
+            </div>
+            <div class="rank">#18</div>
+        </div>
+        <div class="metrics">
+            <div class="m dem"><div class="l">Demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a>,<a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge M" title="Modelled from monthly demand × festival/seasonality multiplier">M</span></div><div class="v up">▲ +49.9%</div></div>
+            <div class="m sup"><div class="l">Supply <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge DM" title="Mixed: real vendor indent history + modelled forecast">D+M</span></div><div class="v up">▲ +52.9%</div></div>
+        </div>
+        <div class="factors"><div>💍 Wedding salad demand <sup><a class="cite" href="references.html#ref5" target="_blank">5</a></sup></div><div>🏔 Nilgiris landslide risk Aug-Sep <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div><div>📍 Single vendor, Ooty 300km+ haul <sup><a class="cite" href="references.html#ref2" target="_blank">2</a></sup></div></div>
+    </div>
+    
+    <div class="box" data-cat="Vegetables" data-tier="Medium" data-dem="14.3" data-sup="58.3">
+        <div class="box-head">
+            <div>
+                <div class="name">Chilli Green (Small)<sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup> <span class="badge D" title="Real data — from SKU Decision Matrix">D</span></div>
+                <div class="cat-pill veg">Vegetables</div>
+            </div>
+            <div class="rank">#19</div>
+        </div>
+        <div class="metrics">
+            <div class="m dem"><div class="l">Demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a>,<a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge M" title="Modelled from monthly demand × festival/seasonality multiplier">M</span></div><div class="v up">▲ +14.3%</div></div>
+            <div class="m sup"><div class="l">Supply <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge DM" title="Mixed: real vendor indent history + modelled forecast">D+M</span></div><div class="v up">▲ +58.3%</div></div>
+        </div>
+        <div class="factors"><div>🍛 Daily SI staple + pickle season <sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup></div><div>🐛 Thrips/mites May-Jul <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div><div>📍 Karnataka Bidar + Guntur (AP) <sup><a class="cite" href="references.html#ref15" target="_blank">15</a></sup></div></div>
+    </div>
+    
+    <div class="box" data-cat="Vegetables" data-tier="Medium" data-dem="232.5" data-sup="375.0">
+        <div class="box-head">
+            <div>
+                <div class="name">Namdhari Watermelon, Loose<sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup> <span class="badge D" title="Real data — from SKU Decision Matrix">D</span></div>
+                <div class="cat-pill veg">Vegetables</div>
+            </div>
+            <div class="rank">#20</div>
+        </div>
+        <div class="metrics">
+            <div class="m dem"><div class="l">Demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a>,<a class="cite" href="references.html#ref5" target="_blank">5</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge M" title="Modelled from monthly demand × festival/seasonality multiplier">M</span></div><div class="v up">▲ +232.5%</div></div>
+            <div class="m sup"><div class="l">Supply <sup><a class="cite" href="references.html#ref2" target="_blank">2</a>,<a class="cite" href="references.html#ref15" target="_blank">15</a></sup> <span class="badge DM" title="Mixed: real vendor indent history + modelled forecast">D+M</span></div><div class="v up">▲ +375.0%</div></div>
+        </div>
+        <div class="factors"><div>☀️ Peak summer (May) — Very High demand <sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup></div><div>🌧 Demand collapses with monsoon (Jun) <sup><a class="cite" href="references.html#ref3" target="_blank">3</a>,<a class="cite" href="references.html#ref4" target="_blank">4</a></sup></div><div>⛽ Heavy 2kg/pc — fuel-sensitive <sup><a class="cite" href="references.html#ref1" target="_blank">1</a></sup></div></div>
+    </div>
+    
+</div>
+<footer>Top 20 SKUs · Built from SKU Decision Matrix + Vendor Indent (Jan–Apr 2026) · Click any superscript number to open the corresponding reference. · <a href="references.html" target="_blank">Open full reference list →</a></footer>
+</div>
+<script>
+function ap() {
+    const c = document.getElementById('fc').value;
+    const t = document.getElementById('ft').value;
+    const s = document.getElementById('fs').value;
+    const g = document.getElementById('g');
+    let bx = Array.from(g.querySelectorAll('.box'));
+    bx.forEach(b => {
+        const cm = !c || b.dataset.cat === c;
+        const tm = !t || b.dataset.tier === t;
+        b.style.display = (cm && tm) ? '' : 'none';
+    });
+    if (s !== 'rank') {
+        bx.sort((a,b) => {
+            if (s === 'dd') return parseFloat(b.dataset.dem) - parseFloat(a.dataset.dem);
+            if (s === 'da') return parseFloat(a.dataset.dem) - parseFloat(b.dataset.dem);
+            if (s === 'sd') return parseFloat(b.dataset.sup) - parseFloat(a.dataset.sup);
+            if (s === 'sa') return parseFloat(a.dataset.sup) - parseFloat(b.dataset.sup);
+        });
+    } else {
+        bx.sort((a,b) => parseInt(a.querySelector('.rank').textContent.slice(1)) - parseInt(b.querySelector('.rank').textContent.slice(1)));
+    }
+    bx.forEach(b => g.appendChild(b));
+}
+</script></body></html>

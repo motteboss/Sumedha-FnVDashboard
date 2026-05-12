@@ -1,0 +1,742 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8">
+<title>FnV Supply Forecast — Pan-India Sources</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f4f6f8; color: #1c2530; line-height: 1.45; }
+.wrap { max-width: 1480px; margin: 0 auto; padding: 24px; }
+header { background: linear-gradient(135deg, #0d3b66, #155e8a); color: white; padding: 28px 24px; border-radius: 12px; margin-bottom: 22px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
+header h1 { font-size: 26px; margin-bottom: 6px; }
+header .sub { opacity: 0.85; font-size: 14px; }
+header .ctx { display:flex; gap:18px; margin-top:14px; flex-wrap:wrap; }
+header .ctx span { background: rgba(255,255,255,0.13); padding: 6px 12px; border-radius: 18px; font-size: 12px; }
+.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 22px; }
+.kpi { background: white; padding: 16px 18px; border-radius: 10px; border: 1px solid #e3e8ee; }
+.kpi .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; color: #6b7989; margin-bottom: 6px; }
+.kpi .val { font-size: 24px; font-weight: 600; color: #0d3b66; }
+.kpi .delta { font-size: 12px; margin-top: 4px; }
+.up { color: #11824a; }
+.down { color: #c0392b; }
+.flat { color: #7d8a99; }
+.toolbar { display:flex; gap:12px; margin-bottom:18px; flex-wrap: wrap; align-items: center; background:white; padding:14px 18px; border-radius:10px; border:1px solid #e3e8ee; }
+.toolbar label { font-size: 12px; color:#6b7989; margin-right: 6px; }
+.toolbar select, .toolbar input { padding: 6px 10px; border: 1px solid #d4dae2; border-radius: 6px; font-size: 13px; background: white; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(440px, 1fr)); gap: 16px; }
+.card { background: white; border-radius: 11px; border: 1px solid #e3e8ee; padding: 16px 18px; transition: box-shadow .2s; cursor: pointer; }
+.card:hover { box-shadow: 0 6px 18px rgba(0,0,0,0.07); }
+.card h3 { font-size: 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.rank { background: #0d3b66; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+.tags { margin: 6px 0 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+.tag { font-size: 10px; padding: 2px 8px; border-radius: 10px; background: #ecf2f8; color: #2c4763; text-transform: uppercase; letter-spacing: 0.4px; }
+.tag.cat-veg { background:#e6f4ea; color:#1c6e3f; }
+.tag.cat-fr { background:#fdecea; color:#a8392c; }
+.tag.cat-hg { background:#e7f1f9; color:#1a5483; }
+.tag.cat-ot { background:#f2eafd; color:#5a3d92; }
+.tag.high { background:#0d3b66; color:white; }
+.tag.med { background:#fff3df; color:#a86b00; }
+.tag.review { background:#fdecea; color:#a8392c; }
+.numbers { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 8px 0; }
+.numbers .n { background: #f7f9fb; padding: 8px 10px; border-radius: 8px; }
+.numbers .n .l { font-size: 10px; color: #6b7989; text-transform: uppercase; }
+.numbers .n .v { font-size: 16px; font-weight: 600; color: #1c2530; }
+.spark { height: 64px; margin: 8px 0 6px; }
+.fctlist { font-size: 11.5px; color: #4a5764; margin-top: 6px; }
+.fctlist b { color: #1c2530; }
+.fctline { padding: 3px 0; border-top: 1px dashed #eee; }
+.fctline:first-child { border-top: 0; }
+.legend { background: white; padding: 14px 18px; border-radius: 10px; border: 1px solid #e3e8ee; margin-top: 22px; font-size: 12.5px; color: #4a5764; }
+.legend h4 { margin-bottom: 8px; color: #0d3b66; font-size: 13px; }
+.legend ul { padding-left: 18px; }
+.legend li { margin: 3px 0; }
+.modal { position: fixed; inset: 0; background: rgba(8,17,30,0.6); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 24px; }
+.modal.open { display: flex; }
+.modal-body { background: white; border-radius: 12px; max-width: 920px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 26px; }
+.modal-body h2 { color: #0d3b66; margin-bottom: 4px; }
+.modal-body .close { float: right; cursor: pointer; font-size: 22px; color: #6b7989; line-height:1; }
+.modal-body section { margin-top: 18px; }
+.modal-body section h3 { color: #155e8a; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; border-bottom: 2px solid #ecf2f8; padding-bottom: 4px; }
+.modal-body .chart-wrap { height: 260px; }
+.fact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.fact-grid .fc { background: #f7f9fb; padding: 11px 13px; border-radius: 8px; }
+.fact-grid .fc h4 { font-size: 11px; text-transform: uppercase; color: #6b7989; margin-bottom: 4px; letter-spacing: 0.5px; }
+.fact-grid .fc p, .fact-grid .fc li { font-size: 12.5px; color: #1c2530; }
+.fact-grid .fc ul { padding-left: 18px; }
+.fest-row { display:flex; justify-content:space-between; align-items:center; padding: 6px 8px; border-bottom:1px solid #f0f3f7; font-size: 12.5px; }
+.fest-row:last-child{border-bottom:0;}
+.fest-lvl { font-size:10px; padding:2px 7px; border-radius:8px; }
+.fest-lvl.very_high{background:#0d3b66;color:white;}
+.fest-lvl.high{background:#155e8a;color:white;}
+.fest-lvl.med{background:#5a85a8;color:white;}
+.fest-lvl.low{background:#c0d2e0;color:#1c2530;}
+.geo-bar { display:flex; height:18px; border-radius:4px; overflow:hidden; margin: 6px 0; }
+.geo-bar div { display:flex; align-items:center; justify-content:center; color:white; font-size:10px; font-weight:600; }
+.alert { background:#fff3df; border-left: 3px solid #d18c00; padding: 8px 12px; margin: 8px 0; font-size:12.5px; color:#664400; border-radius: 4px; }
+.alert.danger { background:#fdecea; border-color:#c0392b; color:#7a1d10; }
+.alert.success { background:#e6f4ea; border-color:#11824a; color:#155f33; }
+footer { text-align:center; font-size:11px; color:#7d8a99; margin-top:30px; padding: 14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header style="background: linear-gradient(135deg, #1f6e43, #1f6e43);" >
+    <h1>FnV Supply Forecast — Pan-India Sources</h1>
+    <div class="sub">Top 20 SKUs · 4-week rolling forecast (May 4 – May 31, 2026) · Built from vendor indent (Jan–Apr 2026) x supply-geography risk model</div>
+    <div class="ctx">
+        <span>📍 Demand: Bangalore consumption</span>
+        <span>🚛 Supply: Pan-India vendor sources</span>
+        <span>📅 History window: 12 weeks (Feb–Apr 2026)</span>
+        <span>🔮 Forecast horizon: 4 weeks</span>
+        <span>🎉 Festival overlay: Eid al-Adha, Buddha Purnima, Wedding season, Vat Savitri</span>
+    </div>
+</header>
+
+<div class="kpi-row">
+  <div class="kpi"><div class="label">SKUs tracked</div><div class="val">20</div><div class="delta flat">All ‘Keep’ tier · 1 ‘Review’ (Watermelon)</div></div>
+  <div class="kpi"><div class="label">Avg supply growth (next 4 wks)</div><div class="val up">▲ +61.7%</div><div class="delta">vs trailing 4-wk avg</div></div>
+  <div class="kpi"><div class="label">SKUs growing</div><div class="val up">20</div><div class="delta">0 declining · 0 flat</div></div>
+  <div class="kpi"><div class="label">Largest mover (↑)</div><div class="val up" style="font-size:18px;">Namdhari Watermelon, Loose</div><div class="delta up">+375.0%</div></div>
+  <div class="kpi"><div class="label">Largest mover (↓)</div><div class="val down" style="font-size:18px;">Cucumber Salad/Hybrid/Green</div><div class="delta down">+7.7%</div></div>
+  <div class="kpi"><div class="label">Total forecast volume / wk</div><div class="val">34,522</div><div class="delta flat">units indented per week (national supply)</div></div>
+</div>
+
+<div class="toolbar">
+    <label>Category:</label>
+    <select id="filter-cat" onchange="applyFilters()">
+        <option value="">All</option>
+        <option>Vegetables</option><option>Fruits</option><option>Herbs/Greens</option><option>Others</option>
+    </select>
+    <label>Tier:</label>
+    <select id="filter-tier" onchange="applyFilters()">
+        <option value="">All</option><option>High</option><option>Medium</option>
+    </select>
+    <label>Trend:</label>
+    <select id="filter-trend" onchange="applyFilters()">
+        <option value="">All</option>
+        <option value="up">Growth ≥ 5%</option>
+        <option value="down">Decline ≥ 5%</option>
+        <option value="flat">Flat (-5 to +5%)</option>
+    </select>
+    <label>Sort:</label>
+    <select id="filter-sort" onchange="applyFilters()">
+        <option value="rank">Rank (volume)</option>
+        <option value="growth-desc">Growth (high → low)</option>
+        <option value="growth-asc">Growth (low → high)</option>
+        <option value="fc-desc">Forecast volume (high → low)</option>
+    </select>
+</div>
+
+<div class="grid" id="grid">
+
+        <div class="card" data-sku="Coriander Leaves Bunch" data-cat="Herbs/Greens" data-tier="High" data-growth="25.3" onclick="openDetail('Coriander Leaves Bunch')">
+            <h3>
+                <span><span class="rank">#1</span> Coriander Leaves Bunch</span>
+                <span class="up" style="font-size:14px;">▲ 25.3%</span>
+            </h3>
+            <div class="tags">
+                <span class="tag cat-hg">Herbs/Greens</span>
+                <span class="tag high">High Tier</span>
+                <span class="tag ">Keep</span>
+            </div>
+            <div class="numbers">
+                <div class="n"><div class="l">Recent wk avg supply</div><div class="v">2,846</div></div>
+                <div class="n"><div class="l">4-wk Forecast (May)</div><div class="v">3,566</div></div>
+                <div class="n"><div class="l">Source mix</div><div class="v">Malur/Sulibele</div></div>
+            </div>
+            <canvas class="spark" id="spark-supply-1"></canvas>
+            <div class="fctlist">
+                <div class="fctline"><b>Supply risk overlays:</b> Pre-monsoon greens yield ↓20%</div>
+            </div>
+        </div>
+        
+        <div class="card" data-sku="Banana Robusta" data-cat="Fruits" data-tier="High" data-growth="53.8" onclick="openDetail('Banana Robusta')">
+            <h3>
+                <span><span class="rank">#2</span> Banana Robusta</span>
+                <span class="up" style="font-size:14px;">▲ 53.8%</span>
+            </h3>
+            <div class="tags">
+                <span class="tag cat-fr">Fruits</span>
+                <span class="tag high">High Tier</span>
+                <span class="tag ">Keep</span>
+            </div>
+            <div class="numbers">
+                <div class="n"><div class="l">Recent wk avg supply</div><div class="v">2,568</div></div>
+                <div class="n"><div class="l">4-wk Forecast (May)</div><div class="v">3,951</div></div>
+                <div class="n"><div class="l">Source mix</div><div class="v">Near Safal</div></div>
+            </div>
+            <canvas class="spark" id="spark-supply-2"></canvas>
+            <div class="fctlist">
+                <div class="fctline"><b>Supply risk overlays:</b> —</div>
+            </div>
+        </div>
+        
+        <div class="card" data-sku="Tomato Natti / Local" data-cat="Vegetables" data-tier="High" data-growth="46.5" onclick="openDetail('Tomato Natti / Local')">
+            <h3>
+                <span><span class="rank">#3</span> Tomato Natti / Local</span>
+                <span class="up" style="font-size:14px;">▲ 46.5%</span>
+            </h3>
+            <div class="tags">
+                <span class="tag cat-veg">Vegetables</span>
+                <span class="tag high">High Tier</span>
+                <span class="tag ">Keep</span>
+            </div>
+            <div class="numbers">
+                <div class="n"><div class="l">Recent wk avg supply</div><div class="v">1,955</div></div>
+                <div class="n"><div class="l">4-wk Forecast (May)</div><div class="v">2,864</div></div>
+                <div class="n"><div class="l">Source mix</div><div class="v">Kolar</div></div>
+            </div>
+            <canvas class="spark" id="spark-supply-3"></canvas>
+            <div class="fctlist">
+                <div class="fctline"><b>Supply risk overlays:</b> Pre-monsoon fruit-drop risk</div>
+            </div>
+        </div>
+        
+        <div class="card" data-sku="Curry leaves" data-cat="Herbs/Greens" data-tier="High" data-growth="26.5" onclick="openDetail('Curry leaves')">
+            <h3>
+                <span><span class="rank">#4</span> Curry leaves</span>
+                <span class="up" style="font-size:14px;">▲ 26.5%</span>
+            </h3>
+            <div class="tags">
+                <span class="tag cat-hg">Herbs/Greens</span>
+                <span class="tag high">High Tier</span>
+                <span class="tag ">Keep</span>
+            </div>
+            <div class="numbers">
+                <div class="n"><div class="l">Recent wk avg supply</div><div class="v">1,361</div></div>
+                <div class="n"><div class="l">4-wk Forecast (May)</div><div class="v">1,721</div></div>
+                <div class="n"><div class="l">Source mix</div><div class="v">Malur/Sulibele</div></div>
+            </div>
+            <canvas class="spark" id="spark-supply-4"></canvas>
+            <div class="fctlist">
+                <div class="fctline"><b>Supply risk overlays:</b> Pre-monsoon greens yield ↓20%</div>
+            </div>
+        </div>
+        
+        <div class="card" data-sku="Potato" data-cat="Vegetables" data-tier="High" data-growth="63.7" onclick="openDetail('Potato')">
+            <h3>
+                <span><span class="rank">#5</span> Potato</span>
+                <span class="up" style="font-size:14px;">▲ 63.7%</span>
+            </h3>
+            <div class="tags">
+                <span class="tag cat-veg">Vegetables</span>
+                <span class="tag high">High Tier</span>
+                <span class="tag ">Keep</span>
+            </div>
+            <div class="numbers">
+                <div class="n"><div class="l">Recent wk avg supply</div><div class="v">1,452</div></div>
+                <div class="n"><div class="l">4-wk Forecast (May)</div><div class="v">2,378</div></div>
+                <div class="n"><div class="l">Source mix</div><div class="v">Chimasandra</div></div>
+            </div>
+            <canvas class="spark" id="spark-supply-5"></canvas>
+            <div class="fctlist">
+                <div class="fctline"><b>Supply risk overlays:</b> —</div>
+            </div>
+        </div>
+        
+        <div class="card" data-sku="Onion" data-cat="Vegetables" data-tier="High" data-growth="59.2" onclick="openDetail('Onion')">
+            <h3>
+                <span><span class="rank">#6</span> Onion</span>
+                <span class="up" style="font-size:14px;">▲ 59.2%</span>
+            </h3>
+            <div class="tags">
+                <span class="tag cat-veg">Vegetables</span>
+                <span class="tag high">High Tier</span>
+                <span class="tag ">Keep</span>
+            </div>
+            <div class="numbers">
+                <div class="n"><div class="l">Recent wk avg supply</div><div class="v">1,814</div></div>
+                <div class="n"><div class="l">4-wk Forecast (May)</div><div class="v">2,888</div></div>
+                <div class="n"><div class="l">Source mix</div><div class="v">Safal</div></div>
+            </div>
+            <canvas class="spark" id="spark-supply-6"></canvas>
+            <div class="fctlist">
+                <div class="fctline"><b>Supply risk overlays:</b> MH rabi outflow tail; export ban watch</div>
+            </div>
+        </div>
+        
+        <div class="card" data-sku="Coconut" data-cat="Vegetables" data-tier="High" data-growth="47.3" onclick="openDetail('Coconut')">
+            <h3>
+                <span><span class="rank">#7</span> Coconut</span>
+                <span class="up" style="font-size:14px;">▲ 47.3%</span>
+            </h3>
+            <div class="tags">
+                <span class="tag cat-veg">Vegetables</span>
+                <span class="tag high">High Tier</span>
+                <span class="tag ">Keep</span>
+            </div>
+            <div class="numbers">
+                <div class="n"><div class="l">Recent wk avg supply</div><div class="v">1,293</div></div>
+                <div class="n"><div class="l">4-wk Forecast (May)</div><div class="v">1,905</div></div>
+                <div class="n"><div class="l">Source mix</div><div class="v">Safal</div></div>
+            </div>
+            <canvas class="spark" id="spark-supply-7"></canvas>
+            <div class="fctlist">
+                <div class="fctline"><b>Supply risk overlays:</b> Wedding demand pulls inventory; cyclone watch</div>
+            </div>
+        </div>
+        
+        <div class="card" data-sku="Banana Elaichi" data-cat="Fruits" data-tier="High" data-growth="52.4" onclick="openDetail('Banana Elaichi')">
+            <h3>
+                <span><span class="rank">#8</span> Banana Elaichi</span>
+                <span class="up" style="font-size:14px;">▲ 52.4%</span>
+            </h3>
+            <div class="tags">
+                <span class="tag cat-fr">Fruits</span>
+                <span class="tag high">High Tier</span>
+                <span class="tag ">Keep</span>
+            </div>
+            <div class="numbers">
+                <div class="n"><div class="l">Recent wk avg supply</div><div class="v">1,016</div></div>
+                <div class="n"><div class="l">4-wk Forecast (May)</div><div class="v">1,548</div></div>
+                <div class="n"><div class="l">Source mix</div><div class="v">Binni mill </div></div>
+            </div>
+            <canvas class="spark" id="spark-supply-8"></canvas>
+            <div class="fctlist">
+                <div class="fctline"><b>Supply risk overlays:</b> —</div>
+            </div>
+        </div>
+        
+        <div class="card" data-sku="Mint / Pudina Leaves" data-cat="Herbs/Greens" data-tier="High" data-growth="26.4" onclick="openDetail('Mint / Pudina Leaves')">
+            <h3>
+                <span><span class="rank">#9</span> Mint / Pudina Leaves</span>
+                <span class="up" style="font-size:14px;">▲ 26.4%</span>
+            </h3>
+            <div class="tags">
+                <span class="tag cat-hg">Herbs/Greens</span>
+                <span class="tag high">High Tier</span>
+                <span class="tag ">Keep</span>
+            </div>
+            <div class="numbers">
+                <div class="n"><div class="l">Recent wk avg supply</div><div class="v">1,044</div></div>
+                <div class="n"><div class="l">4-wk Forecast (May)</div><div class="v">1,319</div></div>
+                <div class="n"><div class="l">Source mix</div><div class="v">Malur/Sulibele</div></div>
+            </div>
+            <canvas class="spark" id="spark-supply-9"></canvas>
+            <div class="fctlist">
+                <div class="fctline"><b>Supply risk overlays:</b> Pre-monsoon greens yield ↓20%</div>
+            </div>
+        </div>
+        
+        <div class="card" data-sku="Tomato Hybrid" data-cat="Vegetables" data-tier="High" data-growth="40.0" onclick="openDetail('Tomato Hybrid')">
+            <h3>
+                <span><span class="rank">#10</span> Tomato Hybrid</span>
+                <span class="up" style="font-size:14px;">▲ 40.0%</span>
+            </h3>
+            <div class="tags">
+                <span class="tag cat-veg">Vegetables</span>
+                <span class="tag high">High Tier</span>
+                <span class="tag ">Keep</span>
+            </div>
+            <div class="numbers">
+                <div class="n"><div class="l">Recent wk avg supply</div><div class="v">1,158</div></div>
+                <div class="n"><div class="l">4-wk Forecast (May)</div><div class="v">1,620</div></div>
+                <div class="n"><div class="l">Source mix</div><div class="v">Kolar</div></div>
+            </div>
+            <canvas class="spark" id="spark-supply-10"></canvas>
+            <div class="fctlist">
+                <div class="fctline"><b>Supply risk overlays:</b> Pre-monsoon fruit-drop risk</div>
+            </div>
+        </div>
+        
+        <div class="card" data-sku="Cucumber Salad/Hybrid/Green" data-cat="Vegetables" data-tier="High" data-growth="7.7" onclick="openDetail('Cucumber Salad/Hybrid/Green')">
+            <h3>
+                <span><span class="rank">#11</span> Cucumber Salad/Hybrid/Green</span>
+                <span class="up" style="font-size:14px;">▲ 7.7%</span>
+            </h3>
+            <div class="tags">
+                <span class="tag cat-veg">Vegetables</span>
+                <span class="tag high">High Tier</span>
+                <span class="tag ">Keep</span>
+            </div>
+            <div class="numbers">
+                <div class="n"><div class="l">Recent wk avg supply</div><div class="v">1,123</div></div>
+                <div class="n"><div class="l">4-wk Forecast (May)</div><div class="v">1,210</div></div>
+                <div class="n"><div class="l">Source mix</div><div class="v">Malur</div></div>
+            </div>
+            <canvas class="spark" id="spark-supply-11"></canvas>
+            <div class="fctlist">
+                <div class="fctline"><b>Supply risk overlays:</b> —</div>
+            </div>
+        </div>
+        
+        <div class="card" data-sku="Spinach Leaves" data-cat="Herbs/Greens" data-tier="High" data-growth="26.0" onclick="openDetail('Spinach Leaves')">
+            <h3>
+                <span><span class="rank">#12</span> Spinach Leaves</span>
+                <span class="up" style="font-size:14px;">▲ 26.0%</span>
+            </h3>
+            <div class="tags">
+                <span class="tag cat-hg">Herbs/Greens</span>
+                <span class="tag high">High Tier</span>
+                <span class="tag ">Keep</span>
+            </div>
+            <div class="numbers">
+                <div class="n"><div class="l">Recent wk avg supply</div><div class="v">678</div></div>
+                <div class="n"><div class="l">4-wk Forecast (May)</div><div class="v">854</div></div>
+                <div class="n"><div class="l">Source mix</div><div class="v">Malur/Sulibele</div></div>
+            </div>
+            <canvas class="spark" id="spark-supply-12"></canvas>
+            <div class="fctlist">
+                <div class="fctline"><b>Supply risk overlays:</b> Pre-monsoon greens yield ↓20%</div>
+            </div>
+        </div>
+        
+        <div class="card" data-sku="Methi Leaves" data-cat="Herbs/Greens" data-tier="High" data-growth="25.0" onclick="openDetail('Methi Leaves')">
+            <h3>
+                <span><span class="rank">#13</span> Methi Leaves</span>
+                <span class="up" style="font-size:14px;">▲ 25.0%</span>
+            </h3>
+            <div class="tags">
+                <span class="tag cat-hg">Herbs/Greens</span>
+                <span class="tag high">High Tier</span>
+                <span class="tag ">Keep</span>
+            </div>
+            <div class="numbers">
+                <div class="n"><div class="l">Recent wk avg supply</div><div class="v">640</div></div>
+                <div class="n"><div class="l">4-wk Forecast (May)</div><div class="v">800</div></div>
+                <div class="n"><div class="l">Source mix</div><div class="v">Malur/Sulibele</div></div>
+            </div>
+            <canvas class="spark" id="spark-supply-13"></canvas>
+            <div class="fctlist">
+                <div class="fctline"><b>Supply risk overlays:</b> Pre-monsoon greens yield ↓20%</div>
+            </div>
+        </div>
+        
+        <div class="card" data-sku="Sweet Corn" data-cat="Vegetables" data-tier="High" data-growth="62.3" onclick="openDetail('Sweet Corn')">
+            <h3>
+                <span><span class="rank">#14</span> Sweet Corn</span>
+                <span class="up" style="font-size:14px;">▲ 62.3%</span>
+            </h3>
+            <div class="tags">
+                <span class="tag cat-veg">Vegetables</span>
+                <span class="tag high">High Tier</span>
+                <span class="tag ">Keep</span>
+            </div>
+            <div class="numbers">
+                <div class="n"><div class="l">Recent wk avg supply</div><div class="v">521</div></div>
+                <div class="n"><div class="l">4-wk Forecast (May)</div><div class="v">846</div></div>
+                <div class="n"><div class="l">Source mix</div><div class="v">Hosakote</div></div>
+            </div>
+            <canvas class="spark" id="spark-supply-14"></canvas>
+            <div class="fctlist">
+                <div class="fctline"><b>Supply risk overlays:</b> —</div>
+            </div>
+        </div>
+        
+        <div class="card" data-sku="Drumstick" data-cat="Vegetables" data-tier="High" data-growth="62.8" onclick="openDetail('Drumstick')">
+            <h3>
+                <span><span class="rank">#15</span> Drumstick</span>
+                <span class="up" style="font-size:14px;">▲ 62.8%</span>
+            </h3>
+            <div class="tags">
+                <span class="tag cat-veg">Vegetables</span>
+                <span class="tag high">High Tier</span>
+                <span class="tag ">Keep</span>
+            </div>
+            <div class="numbers">
+                <div class="n"><div class="l">Recent wk avg supply</div><div class="v">2,495</div></div>
+                <div class="n"><div class="l">4-wk Forecast (May)</div><div class="v">4,062</div></div>
+                <div class="n"><div class="l">Source mix</div><div class="v">TN</div></div>
+            </div>
+            <canvas class="spark" id="spark-supply-15"></canvas>
+            <div class="fctlist">
+                <div class="fctline"><b>Supply risk overlays:</b> TN dependency (cyclone/Cauvery risk); TN harvest peak (upside)</div>
+            </div>
+        </div>
+        
+        <div class="card" data-sku="Papaya" data-cat="Fruits" data-tier="High" data-growth="62.1" onclick="openDetail('Papaya')">
+            <h3>
+                <span><span class="rank">#16</span> Papaya</span>
+                <span class="up" style="font-size:14px;">▲ 62.1%</span>
+            </h3>
+            <div class="tags">
+                <span class="tag cat-fr">Fruits</span>
+                <span class="tag high">High Tier</span>
+                <span class="tag ">Keep</span>
+            </div>
+            <div class="numbers">
+                <div class="n"><div class="l">Recent wk avg supply</div><div class="v">447</div></div>
+                <div class="n"><div class="l">4-wk Forecast (May)</div><div class="v">725</div></div>
+                <div class="n"><div class="l">Source mix</div><div class="v">Safal</div></div>
+            </div>
+            <canvas class="spark" id="spark-supply-16"></canvas>
+            <div class="fctlist">
+                <div class="fctline"><b>Supply risk overlays:</b> —</div>
+            </div>
+        </div>
+        
+        <div class="card" data-sku="Mushroom" data-cat="Others" data-tier="Medium" data-growth="61.6" onclick="openDetail('Mushroom')">
+            <h3>
+                <span><span class="rank">#17</span> Mushroom</span>
+                <span class="up" style="font-size:14px;">▲ 61.6%</span>
+            </h3>
+            <div class="tags">
+                <span class="tag cat-ot">Others</span>
+                <span class="tag med">Medium Tier</span>
+                <span class="tag ">Keep</span>
+            </div>
+            <div class="numbers">
+                <div class="n"><div class="l">Recent wk avg supply</div><div class="v">349</div></div>
+                <div class="n"><div class="l">4-wk Forecast (May)</div><div class="v">564</div></div>
+                <div class="n"><div class="l">Source mix</div><div class="v">Hosakote</div></div>
+            </div>
+            <canvas class="spark" id="spark-supply-17"></canvas>
+            <div class="fctlist">
+                <div class="fctline"><b>Supply risk overlays:</b> —</div>
+            </div>
+        </div>
+        
+        <div class="card" data-sku="Carrot Ooty" data-cat="Vegetables" data-tier="Medium" data-growth="52.9" onclick="openDetail('Carrot Ooty')">
+            <h3>
+                <span><span class="rank">#18</span> Carrot Ooty</span>
+                <span class="up" style="font-size:14px;">▲ 52.9%</span>
+            </h3>
+            <div class="tags">
+                <span class="tag cat-veg">Vegetables</span>
+                <span class="tag med">Medium Tier</span>
+                <span class="tag ">Keep</span>
+            </div>
+            <div class="numbers">
+                <div class="n"><div class="l">Recent wk avg supply</div><div class="v">429</div></div>
+                <div class="n"><div class="l">4-wk Forecast (May)</div><div class="v">656</div></div>
+                <div class="n"><div class="l">Source mix</div><div class="v">City market</div></div>
+            </div>
+            <canvas class="spark" id="spark-supply-18"></canvas>
+            <div class="fctlist">
+                <div class="fctline"><b>Supply risk overlays:</b> —</div>
+            </div>
+        </div>
+        
+        <div class="card" data-sku="Chilli Green (Small)" data-cat="Vegetables" data-tier="Medium" data-growth="58.3" onclick="openDetail('Chilli Green (Small)')">
+            <h3>
+                <span><span class="rank">#19</span> Chilli Green (Small)</span>
+                <span class="up" style="font-size:14px;">▲ 58.3%</span>
+            </h3>
+            <div class="tags">
+                <span class="tag cat-veg">Vegetables</span>
+                <span class="tag med">Medium Tier</span>
+                <span class="tag ">Keep</span>
+            </div>
+            <div class="numbers">
+                <div class="n"><div class="l">Recent wk avg supply</div><div class="v">360</div></div>
+                <div class="n"><div class="l">4-wk Forecast (May)</div><div class="v">570</div></div>
+                <div class="n"><div class="l">Source mix</div><div class="v">Chikkaballapur</div></div>
+            </div>
+            <canvas class="spark" id="spark-supply-19"></canvas>
+            <div class="fctlist">
+                <div class="fctline"><b>Supply risk overlays:</b> —</div>
+            </div>
+        </div>
+        
+        <div class="card" data-sku="Namdhari Watermelon, Loose" data-cat="Vegetables" data-tier="Medium" data-growth="375.0" onclick="openDetail('Namdhari Watermelon, Loose')">
+            <h3>
+                <span><span class="rank">#20</span> Namdhari Watermelon, Loose</span>
+                <span class="up" style="font-size:14px;">▲ 375.0%</span>
+            </h3>
+            <div class="tags">
+                <span class="tag cat-veg">Vegetables</span>
+                <span class="tag med">Medium Tier</span>
+                <span class="tag review">Review</span>
+            </div>
+            <div class="numbers">
+                <div class="n"><div class="l">Recent wk avg supply</div><div class="v">100</div></div>
+                <div class="n"><div class="l">4-wk Forecast (May)</div><div class="v">475</div></div>
+                <div class="n"><div class="l">Source mix</div><div class="v">Safal</div></div>
+            </div>
+            <canvas class="spark" id="spark-supply-20"></canvas>
+            <div class="fctlist">
+                <div class="fctline"><b>Supply risk overlays:</b> —</div>
+            </div>
+        </div>
+        
+</div>
+
+<div class="legend">
+    <h4>How to read this dashboard</h4>
+    <ul>
+      <li><b>Recent wk avg</b> = last 4 weeks' average (pan-India vendor indent); <b>4-wk Forecast</b> = projected average per week May 4–31 2026.</li>
+      <li><b>Growth %</b> = forecast avg vs trailing 4-week avg. ▲ = growth, ▼ = decline, ▬ = flat.</li>
+      <li><b>Supply risk overlays</b> are pulled from the calendar applied to each SKU. Click any card to see weekly history, forecast, and the full factor list.</li>
+      <li><b>Methodology:</b> Forecast = trailing 4-week vendor indent × supply geography risk multiplier (pre-monsoon greens yield, TN dependency, Maharashtra rabi tail, harvest-peak upside).</li>
+    </ul>
+</div>
+
+<footer>Bangalore FnV Forecasting Tool · Top 20 SKUs · Built from SKU Decision Matrix v2-2 + Vendor Indent (Jan-Apr 2026)</footer>
+</div>
+
+<div class="modal" id="modal" onclick="if(event.target===this)closeDetail()">
+    <div class="modal-body" id="modal-body"></div>
+</div>
+
+<script>
+const DATA = {"Coriander Leaves Bunch": {"category": "Herbs/Greens", "tier": "High", "decision": "Keep", "monthly_demand": {"jan": 21905, "feb": 19101, "mar": 22353}, "hist_demand": [{"week_start": "2025-12-29", "value": 2826.5}, {"week_start": "2026-01-05", "value": 4946.3}, {"week_start": "2026-01-12", "value": 4946.3}, {"week_start": "2026-01-19", "value": 4946.3}, {"week_start": "2026-01-26", "value": 4921.9}, {"week_start": "2026-02-02", "value": 4775.2}, {"week_start": "2026-02-09", "value": 4775.2}, {"week_start": "2026-02-16", "value": 4775.2}, {"week_start": "2026-02-23", "value": 4814.1}, {"week_start": "2026-03-02", "value": 5047.5}, {"week_start": "2026-03-09", "value": 5047.5}, {"week_start": "2026-03-16", "value": 5047.5}, {"week_start": "2026-03-23", "value": 5047.5}, {"week_start": "2026-03-30", "value": 5047.5}, {"week_start": "2026-04-06", "value": 5047.5}, {"week_start": "2026-04-13", "value": 5047.5}, {"week_start": "2026-04-20", "value": 5047.5}, {"week_start": "2026-04-27", "value": 2884.3}], "hist_supply": [{"week_start": "2025-12-29", "value": 3620.0}, {"week_start": "2026-01-05", "value": 5792.0}, {"week_start": "2026-01-12", "value": 5700.0}, {"week_start": "2026-01-19", "value": 6105.0}, {"week_start": "2026-01-26", "value": 6236.0}, {"week_start": "2026-02-02", "value": 5910.0}, {"week_start": "2026-02-09", "value": 6220.0}, {"week_start": "2026-02-16", "value": 6460.0}, {"week_start": "2026-02-23", "value": 6120.0}, {"week_start": "2026-03-02", "value": 6260.0}, {"week_start": "2026-03-09", "value": 6605.0}, {"week_start": "2026-03-16", "value": 6680.0}, {"week_start": "2026-03-23", "value": 6800.0}, {"week_start": "2026-03-30", "value": 6450.0}, {"week_start": "2026-04-06", "value": 6632.0}, {"week_start": "2026-04-13", "value": 4750.0}, {"week_start": "2026-04-20", "value": 0}, {"week_start": "2026-04-27", "value": 0}], "forecast_demand": [{"week_start": "2026-05-04", "value": 4882.0, "festivals": [], "note": "Heat-yield risk"}, {"week_start": "2026-05-11", "value": 4882.0, "festivals": [], "note": "Heat-yield risk"}, {"week_start": "2026-05-18", "value": 6103.0, "festivals": ["Eid al-Adha (Bakrid)"], "note": "Heat-yield risk"}, {"week_start": "2026-05-25", "value": 6103.0, "festivals": ["Eid al-Adha (Bakrid)"], "note": "Heat-yield risk"}], "forecast_supply": [{"week_start": "2026-05-04", "value": 3566.0, "risks": ["Pre-monsoon greens yield \u219320%"]}, {"week_start": "2026-05-11", "value": 3566.0, "risks": ["Pre-monsoon greens yield \u219320%"]}, {"week_start": "2026-05-18", "value": 3566.0, "risks": ["Pre-monsoon greens yield \u219320%"]}, {"week_start": "2026-05-25", "value": 3566.0, "risks": ["Pre-monsoon greens yield \u219320%"]}], "demand_growth_pct": 21.9, "supply_growth_pct": 25.3, "fc_avg_demand": 5492.0, "fc_avg_supply": 3566.0, "vendor_locations": {"Malur/Sulibele": 96340.0}, "vendors": {"Vijay": 59278.0, "MURALI R": 37062.0}, "factors": {"festivals_demand": [["Ramzan/Eid", "High \u2014 biryani garnish & chutneys"], ["Wedding season May-Jun", "Med"]], "weather": "Highly heat-sensitive. Apr-Jun yield drops 25-35%. Top-icing & cold chain non-negotiable.", "harvest_origin": ["Karnataka peri-urban (Hosakote, Chikkaballapur)", "Andhra Pradesh (Anantapur)"], "monsoon_impact": "Pre-monsoon (May): supply tight. Monsoon (Jun-Sep): bunch quality drops, fungal risk.", "disruption": ["Wilting in transit if break in cold chain >2hrs", "Daily-source SKU \u2014 no buffer stock"], "fuel_sensitivity": "High \u2014 daily multi-trip from peri-urban farms"}, "demand_total_3m": 63359, "supply_total": 96340.0}, "Banana Robusta": {"category": "Fruits", "tier": "High", "decision": "Keep", "monthly_demand": {"jan": 20470, "feb": 17795, "mar": 22168}, "hist_demand": [{"week_start": "2025-12-29", "value": 2641.3}, {"week_start": "2026-01-05", "value": 4622.3}, {"week_start": "2026-01-12", "value": 4622.3}, {"week_start": "2026-01-19", "value": 4622.3}, {"week_start": "2026-01-26", "value": 4597.5}, {"week_start": "2026-02-02", "value": 4448.8}, {"week_start": "2026-02-09", "value": 4448.8}, {"week_start": "2026-02-16", "value": 4448.8}, {"week_start": "2026-02-23", "value": 4528.3}, {"week_start": "2026-03-02", "value": 5005.7}, {"week_start": "2026-03-09", "value": 5005.7}, {"week_start": "2026-03-16", "value": 5005.7}, {"week_start": "2026-03-23", "value": 5005.7}, {"week_start": "2026-03-30", "value": 5005.7}, {"week_start": "2026-04-06", "value": 5005.7}, {"week_start": "2026-04-13", "value": 5005.7}, {"week_start": "2026-04-20", "value": 5005.7}, {"week_start": "2026-04-27", "value": 2860.4}], "hist_supply": [{"week_start": "2025-12-29", "value": 2675.0}, {"week_start": "2026-01-05", "value": 4912.0}, {"week_start": "2026-01-12", "value": 4560.0}, {"week_start": "2026-01-19", "value": 4600.0}, {"week_start": "2026-01-26", "value": 4691.0}, {"week_start": "2026-02-02", "value": 4540.0}, {"week_start": "2026-02-09", "value": 4464.0}, {"week_start": "2026-02-16", "value": 4420.0}, {"week_start": "2026-02-23", "value": 4817.0}, {"week_start": "2026-03-02", "value": 4850.0}, {"week_start": "2026-03-09", "value": 5120.0}, {"week_start": "2026-03-16", "value": 5575.0}, {"week_start": "2026-03-23", "value": 5690.0}, {"week_start": "2026-03-30", "value": 5530.0}, {"week_start": "2026-04-06", "value": 5863.0}, {"week_start": "2026-04-13", "value": 4410.0}, {"week_start": "2026-04-20", "value": 0}, {"week_start": "2026-04-27", "value": 0}], "forecast_demand": [{"week_start": "2026-05-04", "value": 6241.0, "festivals": [], "note": ""}, {"week_start": "2026-05-11", "value": 6740.0, "festivals": ["Buddha Purnima"], "note": ""}, {"week_start": "2026-05-18", "value": 8425.0, "festivals": ["Buddha Purnima", "Eid al-Adha (Bakrid)"], "note": ""}, {"week_start": "2026-05-25", "value": 9099.0, "festivals": ["Buddha Purnima", "Eid al-Adha (Bakrid)", "Vat Savitri"], "note": ""}], "forecast_supply": [{"week_start": "2026-05-04", "value": 3951.0, "risks": []}, {"week_start": "2026-05-11", "value": 3951.0, "risks": []}, {"week_start": "2026-05-18", "value": 3951.0, "risks": []}, {"week_start": "2026-05-25", "value": 3951.0, "risks": []}], "demand_growth_pct": 70.6, "supply_growth_pct": 53.8, "fc_avg_demand": 7626.0, "fc_avg_supply": 3951.0, "vendor_locations": {"Near Safal": 71513.0, "Safal": 5204.0}, "vendors": {"Narmada": 44055.0, "FRESHCO AGRI SUPPLIES F&V": 5204.0, "RAJ GOPAL D": 27458.0}, "factors": {"festivals_demand": [["Eid al-Adha (May 27)", "Med"], ["Ganga Dussehra", "Low"], ["Daily pooja staple", "Constant"]], "weather": "Heat-tolerant. Pre-monsoon ripening accelerates \u2014 DC ripening must be staggered.", "harvest_origin": ["Tamil Nadu (Theni, Trichy)", "Andhra Pradesh (Kadapa, Anantapur)", "Maharashtra (Jalgaon)"], "monsoon_impact": "Cyclones in TN/AP coast disrupt rake movement. Monitor IMD South Peninsula bulletins.", "disruption": ["Cyclone risk Apr-Jun in Bay of Bengal", "TN Trichy harvest dip Jul-Aug"], "fuel_sensitivity": "Med \u2014 long-haul truck from TN/AP, diesel exposure"}, "demand_total_3m": 60433, "supply_total": 76717.0}, "Tomato Natti / Local": {"category": "Vegetables", "tier": "High", "decision": "Keep", "monthly_demand": {"jan": 14999, "feb": 13496, "mar": 14676}, "hist_demand": [{"week_start": "2025-12-29", "value": 1935.4}, {"week_start": "2026-01-05", "value": 3386.9}, {"week_start": "2026-01-12", "value": 3386.9}, {"week_start": "2026-01-19", "value": 3386.9}, {"week_start": "2026-01-26", "value": 3385.0}, {"week_start": "2026-02-02", "value": 3374.0}, {"week_start": "2026-02-09", "value": 3374.0}, {"week_start": "2026-02-16", "value": 3374.0}, {"week_start": "2026-02-23", "value": 3365.4}, {"week_start": "2026-03-02", "value": 3313.9}, {"week_start": "2026-03-09", "value": 3313.9}, {"week_start": "2026-03-16", "value": 3313.9}, {"week_start": "2026-03-23", "value": 3313.9}, {"week_start": "2026-03-30", "value": 3313.9}, {"week_start": "2026-04-06", "value": 3313.9}, {"week_start": "2026-04-13", "value": 3313.9}, {"week_start": "2026-04-20", "value": 3313.9}, {"week_start": "2026-04-27", "value": 1893.7}], "hist_supply": [{"week_start": "2025-12-29", "value": 2340.0}, {"week_start": "2026-01-05", "value": 4157.0}, {"week_start": "2026-01-12", "value": 4192.0}, {"week_start": "2026-01-19", "value": 4330.0}, {"week_start": "2026-01-26", "value": 4520.0}, {"week_start": "2026-02-02", "value": 4310.0}, {"week_start": "2026-02-09", "value": 4190.0}, {"week_start": "2026-02-16", "value": 4190.0}, {"week_start": "2026-02-23", "value": 4420.0}, {"week_start": "2026-03-02", "value": 4580.0}, {"week_start": "2026-03-09", "value": 4505.0}, {"week_start": "2026-03-16", "value": 4770.0}, {"week_start": "2026-03-23", "value": 4800.0}, {"week_start": "2026-03-30", "value": 4910.0}, {"week_start": "2026-04-06", "value": 4510.0}, {"week_start": "2026-04-13", "value": 3310.0}, {"week_start": "2026-04-20", "value": 0}, {"week_start": "2026-04-27", "value": 0}], "forecast_demand": [{"week_start": "2026-05-04", "value": 4502.0, "festivals": ["Karnataka Wedding Season"], "note": ""}, {"week_start": "2026-05-11", "value": 4502.0, "festivals": ["Karnataka Wedding Season"], "note": ""}, {"week_start": "2026-05-18", "value": 5628.0, "festivals": ["Eid al-Adha (Bakrid)", "Karnataka Wedding Season"], "note": ""}, {"week_start": "2026-05-25", "value": 5628.0, "festivals": ["Eid al-Adha (Bakrid)", "Karnataka Wedding Season"], "note": ""}], "forecast_supply": [{"week_start": "2026-05-04", "value": 2864.0, "risks": ["Pre-monsoon fruit-drop risk"]}, {"week_start": "2026-05-11", "value": 2864.0, "risks": ["Pre-monsoon fruit-drop risk"]}, {"week_start": "2026-05-18", "value": 2864.0, "risks": ["Pre-monsoon fruit-drop risk"]}, {"week_start": "2026-05-25", "value": 2864.0, "risks": ["Pre-monsoon fruit-drop risk"]}], "demand_growth_pct": 71.2, "supply_growth_pct": 46.5, "fc_avg_demand": 5065.0, "fc_avg_supply": 2864.0, "vendor_locations": {"Kolar": 33582.0, "Chikkaballapur": 13171.0, "Goravigere": 14671.0, "Near Safal": 6610.0}, "vendors": {"Amaresh N F&V": 33582.0, "Manohara S": 13171.0, "TILAKSHA'S AGRO FARMS F&V": 14671.0, "LB Salesmart Private Limited KA": 6610.0}, "factors": {"festivals_demand": [["Wedding season May-Jun", "High \u2014 sambar/rasam staple"], ["Eid", "Med"]], "weather": "Pre-monsoon heat causes fruit-drop. May-Jun = lean season. Prices typically peak.", "harvest_origin": ["Karnataka (Kolar, Chikkaballapur, Hosakote)", "Andhra Pradesh (Madanapalle)"], "monsoon_impact": "Late monsoon flooding (Sep-Oct) destroys Kolar belt. Plan buffer Aug.", "disruption": ["Kolar mandi strikes (rare but high-impact)", "Madanapalle price arbitrage swings"], "fuel_sensitivity": "Low \u2014 short-haul (60-100km)"}, "demand_total_3m": 43171, "supply_total": 68034.0}, "Curry leaves": {"category": "Herbs/Greens", "tier": "High", "decision": "Keep", "monthly_demand": {"jan": 10680, "feb": 10658, "mar": 11261}, "hist_demand": [{"week_start": "2025-12-29", "value": 1378.1}, {"week_start": "2026-01-05", "value": 2411.6}, {"week_start": "2026-01-12", "value": 2411.6}, {"week_start": "2026-01-19", "value": 2411.6}, {"week_start": "2026-01-26", "value": 2447.7}, {"week_start": "2026-02-02", "value": 2664.5}, {"week_start": "2026-02-09", "value": 2664.5}, {"week_start": "2026-02-16", "value": 2664.5}, {"week_start": "2026-02-23", "value": 2647.1}, {"week_start": "2026-03-02", "value": 2542.8}, {"week_start": "2026-03-09", "value": 2542.8}, {"week_start": "2026-03-16", "value": 2542.8}, {"week_start": "2026-03-23", "value": 2542.8}, {"week_start": "2026-03-30", "value": 2542.8}, {"week_start": "2026-04-06", "value": 2542.8}, {"week_start": "2026-04-13", "value": 2542.8}, {"week_start": "2026-04-20", "value": 2542.8}, {"week_start": "2026-04-27", "value": 1453.0}], "hist_supply": [{"week_start": "2025-12-29", "value": 1926.0}, {"week_start": "2026-01-05", "value": 3366.0}, {"week_start": "2026-01-12", "value": 3040.0}, {"week_start": "2026-01-19", "value": 3380.0}, {"week_start": "2026-01-26", "value": 3443.0}, {"week_start": "2026-02-02", "value": 3450.0}, {"week_start": "2026-02-09", "value": 3560.0}, {"week_start": "2026-02-16", "value": 3540.0}, {"week_start": "2026-02-23", "value": 3450.0}, {"week_start": "2026-03-02", "value": 3460.0}, {"week_start": "2026-03-09", "value": 3070.0}, {"week_start": "2026-03-16", "value": 3325.0}, {"week_start": "2026-03-23", "value": 3500.0}, {"week_start": "2026-03-30", "value": 3160.0}, {"week_start": "2026-04-06", "value": 3113.0}, {"week_start": "2026-04-13", "value": 2330.0}, {"week_start": "2026-04-20", "value": 0}, {"week_start": "2026-04-27", "value": 0}], "forecast_demand": [{"week_start": "2026-05-04", "value": 2756.0, "festivals": [], "note": ""}, {"week_start": "2026-05-11", "value": 2756.0, "festivals": [], "note": ""}, {"week_start": "2026-05-18", "value": 2756.0, "festivals": [], "note": ""}, {"week_start": "2026-05-25", "value": 2756.0, "festivals": [], "note": ""}], "forecast_supply": [{"week_start": "2026-05-04", "value": 1721.0, "risks": ["Pre-monsoon greens yield \u219320%"]}, {"week_start": "2026-05-11", "value": 1721.0, "risks": ["Pre-monsoon greens yield \u219320%"]}, {"week_start": "2026-05-18", "value": 1721.0, "risks": ["Pre-monsoon greens yield \u219320%"]}, {"week_start": "2026-05-25", "value": 1721.0, "risks": ["Pre-monsoon greens yield \u219320%"]}], "demand_growth_pct": 21.4, "supply_growth_pct": 26.5, "fc_avg_demand": 2756.0, "fc_avg_supply": 1721.0, "vendor_locations": {"Malur/Sulibele": 51113.0}, "vendors": {"Vijay": 33065.0, "MURALI R": 18048.0}, "factors": {"festivals_demand": [["Daily SI cooking staple", "Constant"], ["Ugadi (Mar)", "Med \u2014 past"]], "weather": "Hardy. Mild dip in peak summer.", "harvest_origin": ["Karnataka peri-urban", "Tamil Nadu (Salem belt)"], "monsoon_impact": "Generally robust through monsoon.", "disruption": ["Pest outbreak risk (whitefly) May-Jul"], "fuel_sensitivity": "Low"}, "demand_total_3m": 32599, "supply_total": 51113.0}, "Potato": {"category": "Vegetables", "tier": "High", "decision": "Keep", "monthly_demand": {"jan": 11866, "feb": 10006, "mar": 10493}, "hist_demand": [{"week_start": "2025-12-29", "value": 1531.1}, {"week_start": "2026-01-05", "value": 2679.4}, {"week_start": "2026-01-12", "value": 2679.4}, {"week_start": "2026-01-19", "value": 2679.4}, {"week_start": "2026-01-26", "value": 2654.0}, {"week_start": "2026-02-02", "value": 2501.5}, {"week_start": "2026-02-09", "value": 2501.5}, {"week_start": "2026-02-16", "value": 2501.5}, {"week_start": "2026-02-23", "value": 2482.6}, {"week_start": "2026-03-02", "value": 2369.4}, {"week_start": "2026-03-09", "value": 2369.4}, {"week_start": "2026-03-16", "value": 2369.4}, {"week_start": "2026-03-23", "value": 2369.4}, {"week_start": "2026-03-30", "value": 2369.4}, {"week_start": "2026-04-06", "value": 2369.4}, {"week_start": "2026-04-13", "value": 2369.4}, {"week_start": "2026-04-20", "value": 2369.4}, {"week_start": "2026-04-27", "value": 1353.9}], "hist_supply": [{"week_start": "2025-12-29", "value": 2836.0}, {"week_start": "2026-01-05", "value": 3484.0}, {"week_start": "2026-01-12", "value": 3198.0}, {"week_start": "2026-01-19", "value": 3690.0}, {"week_start": "2026-01-26", "value": 3720.0}, {"week_start": "2026-02-02", "value": 3713.0}, {"week_start": "2026-02-09", "value": 3970.0}, {"week_start": "2026-02-16", "value": 4150.0}, {"week_start": "2026-02-23", "value": 3960.0}, {"week_start": "2026-03-02", "value": 4000.0}, {"week_start": "2026-03-09", "value": 3705.0}, {"week_start": "2026-03-16", "value": 3782.0}, {"week_start": "2026-03-23", "value": 4000.0}, {"week_start": "2026-03-30", "value": 3700.0}, {"week_start": "2026-04-06", "value": 3430.0}, {"week_start": "2026-04-13", "value": 2380.0}, {"week_start": "2026-04-20", "value": 0}, {"week_start": "2026-04-27", "value": 0}], "forecast_demand": [{"week_start": "2026-05-04", "value": 2894.0, "festivals": ["Karnataka Wedding Season"], "note": ""}, {"week_start": "2026-05-11", "value": 2894.0, "festivals": ["Karnataka Wedding Season"], "note": ""}, {"week_start": "2026-05-18", "value": 2894.0, "festivals": ["Karnataka Wedding Season"], "note": ""}, {"week_start": "2026-05-25", "value": 2894.0, "festivals": ["Karnataka Wedding Season"], "note": ""}], "forecast_supply": [{"week_start": "2026-05-04", "value": 2378.0, "risks": []}, {"week_start": "2026-05-11", "value": 2378.0, "risks": []}, {"week_start": "2026-05-18", "value": 2378.0, "risks": []}, {"week_start": "2026-05-25", "value": 2378.0, "risks": []}], "demand_growth_pct": 36.8, "supply_growth_pct": 63.7, "fc_avg_demand": 2894.0, "fc_avg_supply": 2378.0, "vendor_locations": {"Chimasandra": 57718.0}, "vendors": {"KAMALA BHANDER F&V": 34726.0, "BASAVA AGRO VENTURES LLP KA": 22992.0}, "factors": {"festivals_demand": [["Wedding season May-Jun", "High"], ["Eid al-Adha", "High \u2014 biryani"]], "weather": "Cold-storage commodity. May-Jun pulls from Punjab/UP cold storage \u2014 quality declines.", "harvest_origin": ["Punjab (Jalandhar) cold storage", "UP (Agra/Hathras)", "West Bengal", "Karnataka (Hassan rabi)"], "monsoon_impact": "Cold-storage dependence Jul-Oct. Storage rot risk if power outages.", "disruption": ["Cold storage tariff hikes", "Punjab rake disruption", "CIPC sprout-control phase-out"], "fuel_sensitivity": "High \u2014 long-haul rail+road from Punjab/UP"}, "demand_total_3m": 32365, "supply_total": 57718.0}, "Onion": {"category": "Vegetables", "tier": "High", "decision": "Keep", "monthly_demand": {"jan": 14025, "feb": 8903, "mar": 9199}, "hist_demand": [{"week_start": "2025-12-29", "value": 1809.7}, {"week_start": "2026-01-05", "value": 3166.9}, {"week_start": "2026-01-12", "value": 3166.9}, {"week_start": "2026-01-19", "value": 3166.9}, {"week_start": "2026-01-26", "value": 3032.5}, {"week_start": "2026-02-02", "value": 2225.8}, {"week_start": "2026-02-09", "value": 2225.8}, {"week_start": "2026-02-16", "value": 2225.8}, {"week_start": "2026-02-23", "value": 2204.5}, {"week_start": "2026-03-02", "value": 2077.2}, {"week_start": "2026-03-09", "value": 2077.2}, {"week_start": "2026-03-16", "value": 2077.2}, {"week_start": "2026-03-23", "value": 2077.2}, {"week_start": "2026-03-30", "value": 2077.2}, {"week_start": "2026-04-06", "value": 2077.2}, {"week_start": "2026-04-13", "value": 2077.2}, {"week_start": "2026-04-20", "value": 2077.2}, {"week_start": "2026-04-27", "value": 1187.0}], "hist_supply": [{"week_start": "2025-12-29", "value": 2798.0}, {"week_start": "2026-01-05", "value": 4379.0}, {"week_start": "2026-01-12", "value": 5197.0}, {"week_start": "2026-01-19", "value": 6360.0}, {"week_start": "2026-01-26", "value": 5120.0}, {"week_start": "2026-02-02", "value": 5930.0}, {"week_start": "2026-02-09", "value": 6221.0}, {"week_start": "2026-02-16", "value": 5015.0}, {"week_start": "2026-02-23", "value": 4523.0}, {"week_start": "2026-03-02", "value": 4900.0}, {"week_start": "2026-03-09", "value": 4950.0}, {"week_start": "2026-03-16", "value": 4701.0}, {"week_start": "2026-03-23", "value": 4900.0}, {"week_start": "2026-03-30", "value": 4900.0}, {"week_start": "2026-04-06", "value": 4354.0}, {"week_start": "2026-04-13", "value": 2904.0}, {"week_start": "2026-04-20", "value": 0}, {"week_start": "2026-04-27", "value": 0}], "forecast_demand": [{"week_start": "2026-05-04", "value": 1940.0, "festivals": ["Karnataka Wedding Season"], "note": ""}, {"week_start": "2026-05-11", "value": 1940.0, "festivals": ["Karnataka Wedding Season"], "note": ""}, {"week_start": "2026-05-18", "value": 2425.0, "festivals": ["Eid al-Adha (Bakrid)", "Karnataka Wedding Season"], "note": ""}, {"week_start": "2026-05-25", "value": 2425.0, "festivals": ["Eid al-Adha (Bakrid)", "Karnataka Wedding Season"], "note": ""}], "forecast_supply": [{"week_start": "2026-05-04", "value": 2888.0, "risks": ["MH rabi outflow tail; export ban watch"]}, {"week_start": "2026-05-11", "value": 2888.0, "risks": ["MH rabi outflow tail; export ban watch"]}, {"week_start": "2026-05-18", "value": 2888.0, "risks": ["MH rabi outflow tail; export ban watch"]}, {"week_start": "2026-05-25", "value": 2888.0, "risks": ["MH rabi outflow tail; export ban watch"]}], "demand_growth_pct": 17.7, "supply_growth_pct": 59.2, "fc_avg_demand": 2182.0, "fc_avg_supply": 2888.0, "vendor_locations": {"Chimasandra": 3118.0, "Hosakote": 31335.0, "Safal": 42685.0, "City market": 14.0}, "vendors": {"ROHSTOFF PRODUCTS PRIVATE LIMITED F&V": 3118.0, "SL Veggies": 31335.0, "Manjunath WM": 19389.0, "Market": 14.0, "DEOLA VENTURES PRIVATE LIMITED F&V": 23295.0, "All Seasons F&V": 1.0}, "factors": {"festivals_demand": [["Wedding season", "Very High"], ["Eid", "Very High"], ["Ramzan", "High"]], "weather": "Maharashtra unseasonal rain = price shock. Pre-monsoon = peak rabi outflow.", "harvest_origin": ["Maharashtra (Nashik, Lasalgaon \u2014 Asia's largest mandi)", "Karnataka (Bagalkot, Gadag)", "Madhya Pradesh"], "monsoon_impact": "Jul-Sep storage rot risk (rabi). Kharif (Oct-Dec) at risk if heavy rain.", "disruption": ["Govt export bans (recent precedent)", "NAFED MSP procurement", "Lasalgaon strikes", "MEP changes"], "fuel_sensitivity": "High \u2014 long-haul from Maharashtra"}, "demand_total_3m": 32127, "supply_total": 77152.0}, "Coconut": {"category": "Vegetables", "tier": "High", "decision": "Keep", "monthly_demand": {"jan": 9794, "feb": 8394, "mar": 9151}, "hist_demand": [{"week_start": "2025-12-29", "value": 1263.7}, {"week_start": "2026-01-05", "value": 2211.5}, {"week_start": "2026-01-12", "value": 2211.5}, {"week_start": "2026-01-19", "value": 2211.5}, {"week_start": "2026-01-26", "value": 2195.4}, {"week_start": "2026-02-02", "value": 2098.5}, {"week_start": "2026-02-09", "value": 2098.5}, {"week_start": "2026-02-16", "value": 2098.5}, {"week_start": "2026-02-23", "value": 2093.9}, {"week_start": "2026-03-02", "value": 2066.4}, {"week_start": "2026-03-09", "value": 2066.4}, {"week_start": "2026-03-16", "value": 2066.4}, {"week_start": "2026-03-23", "value": 2066.4}, {"week_start": "2026-03-30", "value": 2066.4}, {"week_start": "2026-04-06", "value": 2066.4}, {"week_start": "2026-04-13", "value": 2066.4}, {"week_start": "2026-04-20", "value": 2066.4}, {"week_start": "2026-04-27", "value": 1180.8}], "hist_supply": [{"week_start": "2025-12-29", "value": 1410.0}, {"week_start": "2026-01-05", "value": 2530.0}, {"week_start": "2026-01-12", "value": 4076.0}, {"week_start": "2026-01-19", "value": 2925.0}, {"week_start": "2026-01-26", "value": 3204.0}, {"week_start": "2026-02-02", "value": 2639.0}, {"week_start": "2026-02-09", "value": 3129.0}, {"week_start": "2026-02-16", "value": 2860.0}, {"week_start": "2026-02-23", "value": 2515.0}, {"week_start": "2026-03-02", "value": 2570.0}, {"week_start": "2026-03-09", "value": 2610.0}, {"week_start": "2026-03-16", "value": 3030.0}, {"week_start": "2026-03-23", "value": 2800.0}, {"week_start": "2026-03-30", "value": 2850.0}, {"week_start": "2026-04-06", "value": 3027.0}, {"week_start": "2026-04-13", "value": 2145.0}, {"week_start": "2026-04-20", "value": 0}, {"week_start": "2026-04-27", "value": 0}], "forecast_demand": [{"week_start": "2026-05-04", "value": 2711.0, "festivals": ["Karnataka Wedding Season"], "note": ""}, {"week_start": "2026-05-11", "value": 2928.0, "festivals": ["Buddha Purnima", "Karnataka Wedding Season"], "note": ""}, {"week_start": "2026-05-18", "value": 2928.0, "festivals": ["Buddha Purnima", "Karnataka Wedding Season"], "note": ""}, {"week_start": "2026-05-25", "value": 3162.0, "festivals": ["Buddha Purnima", "Vat Savitri", "Karnataka Wedding Season"], "note": ""}], "forecast_supply": [{"week_start": "2026-05-04", "value": 1905.0, "risks": ["Wedding demand pulls inventory; cyclone watch"]}, {"week_start": "2026-05-11", "value": 1905.0, "risks": ["Wedding demand pulls inventory; cyclone watch"]}, {"week_start": "2026-05-18", "value": 1905.0, "risks": ["Wedding demand pulls inventory; cyclone watch"]}, {"week_start": "2026-05-25", "value": 1905.0, "risks": ["Wedding demand pulls inventory; cyclone watch"]}], "demand_growth_pct": 58.9, "supply_growth_pct": 47.3, "fc_avg_demand": 2932.0, "fc_avg_supply": 1905.0, "vendor_locations": {"Safal": 42267.0, "Goravigere": 2053.0}, "vendors": {"SRISAMPADA FARMS": 42267.0, "TILAKSHA'S AGRO FARMS F&V": 2053.0}, "factors": {"festivals_demand": [["Wedding season May-Jun", "Very High"], ["Akshaya Tritiya", "High \u2014 past"], ["Vat Savitri", "Med"], ["Daily pooja", "Constant"]], "weather": "TN/Kerala cyclones disrupt supply. Drought-resilient but yield 12-month lag.", "harvest_origin": ["Tamil Nadu (Pollachi, Coimbatore)", "Kerala", "Karnataka (Tumkur, Hassan)", "Andhra Pradesh (East Godavari)"], "monsoon_impact": "SW monsoon onset (Jun) drives wedding-coconut demand spike vs supply lag.", "disruption": ["Pollachi mandi strikes", "Cauvery water dispute", "Diesel price impact on long-haul", "Cyclone Burevi/Tauktae-class events"], "fuel_sensitivity": "Very High \u2014 Pollachi to Bangalore 350km+"}, "demand_total_3m": 27339, "supply_total": 44320.0}, "Banana Elaichi": {"category": "Fruits", "tier": "High", "decision": "Keep", "monthly_demand": {"jan": 9002, "feb": 7707, "mar": 9582}, "hist_demand": [{"week_start": "2025-12-29", "value": 1161.5}, {"week_start": "2026-01-05", "value": 2032.7}, {"week_start": "2026-01-12", "value": 2032.7}, {"week_start": "2026-01-19", "value": 2032.7}, {"week_start": "2026-01-26", "value": 2017.6}, {"week_start": "2026-02-02", "value": 1926.8}, {"week_start": "2026-02-09", "value": 1926.8}, {"week_start": "2026-02-16", "value": 1926.8}, {"week_start": "2026-02-23", "value": 1960.6}, {"week_start": "2026-03-02", "value": 2163.7}, {"week_start": "2026-03-09", "value": 2163.7}, {"week_start": "2026-03-16", "value": 2163.7}, {"week_start": "2026-03-23", "value": 2163.7}, {"week_start": "2026-03-30", "value": 2163.7}, {"week_start": "2026-04-06", "value": 2163.7}, {"week_start": "2026-04-13", "value": 2163.7}, {"week_start": "2026-04-20", "value": 2163.7}, {"week_start": "2026-04-27", "value": 1236.4}], "hist_supply": [{"week_start": "2025-12-29", "value": 1270.0}, {"week_start": "2026-01-05", "value": 2187.0}, {"week_start": "2026-01-12", "value": 2247.0}, {"week_start": "2026-01-19", "value": 2180.0}, {"week_start": "2026-01-26", "value": 2017.0}, {"week_start": "2026-02-02", "value": 2010.0}, {"week_start": "2026-02-09", "value": 2083.0}, {"week_start": "2026-02-16", "value": 2090.0}, {"week_start": "2026-02-23", "value": 2182.0}, {"week_start": "2026-03-02", "value": 2300.0}, {"week_start": "2026-03-09", "value": 2168.0}, {"week_start": "2026-03-16", "value": 2050.0}, {"week_start": "2026-03-23", "value": 2120.0}, {"week_start": "2026-03-30", "value": 2130.0}, {"week_start": "2026-04-06", "value": 2414.0}, {"week_start": "2026-04-13", "value": 1650.0}, {"week_start": "2026-04-20", "value": 0}, {"week_start": "2026-04-27", "value": 0}], "forecast_demand": [{"week_start": "2026-05-04", "value": 2657.0, "festivals": [], "note": ""}, {"week_start": "2026-05-11", "value": 2869.0, "festivals": ["Buddha Purnima"], "note": ""}, {"week_start": "2026-05-18", "value": 3587.0, "festivals": ["Buddha Purnima", "Eid al-Adha (Bakrid)"], "note": ""}, {"week_start": "2026-05-25", "value": 3874.0, "festivals": ["Buddha Purnima", "Eid al-Adha (Bakrid)", "Vat Savitri"], "note": ""}], "forecast_supply": [{"week_start": "2026-05-04", "value": 1548.0, "risks": []}, {"week_start": "2026-05-11", "value": 1548.0, "risks": []}, {"week_start": "2026-05-18", "value": 1548.0, "risks": []}, {"week_start": "2026-05-25", "value": 1548.0, "risks": []}], "demand_growth_pct": 68.1, "supply_growth_pct": 52.4, "fc_avg_demand": 3247.0, "fc_avg_supply": 1548.0, "vendor_locations": {"Binni mill ": 33038.0, "Safal": 60.0}, "vendors": {"R Sathish Kumar F&V": 33038.0, "FRESHCO AGRI SUPPLIES F&V": 60.0}, "factors": {"festivals_demand": [["Eid", "Med"], ["Premium daily", "Constant"]], "weather": "Heat-tolerant. Smaller acreage = thinner supply buffer.", "harvest_origin": ["Tamil Nadu (Theni)", "Karnataka (Chamarajanagar)"], "monsoon_impact": "Niche varietal \u2014 Cauvery basin disputes can affect supply.", "disruption": ["Limited vendor base (3) = vendor concentration risk"], "fuel_sensitivity": "Med"}, "demand_total_3m": 26291, "supply_total": 33098.0}, "Mint / Pudina Leaves": {"category": "Herbs/Greens", "tier": "High", "decision": "Keep", "monthly_demand": {"jan": 8433, "feb": 7317, "mar": 8808}, "hist_demand": [{"week_start": "2025-12-29", "value": 1088.1}, {"week_start": "2026-01-05", "value": 1904.2}, {"week_start": "2026-01-12", "value": 1904.2}, {"week_start": "2026-01-19", "value": 1904.2}, {"week_start": "2026-01-26", "value": 1893.5}, {"week_start": "2026-02-02", "value": 1829.2}, {"week_start": "2026-02-09", "value": 1829.2}, {"week_start": "2026-02-16", "value": 1829.2}, {"week_start": "2026-02-23", "value": 1852.1}, {"week_start": "2026-03-02", "value": 1988.9}, {"week_start": "2026-03-09", "value": 1988.9}, {"week_start": "2026-03-16", "value": 1988.9}, {"week_start": "2026-03-23", "value": 1988.9}, {"week_start": "2026-03-30", "value": 1988.9}, {"week_start": "2026-04-06", "value": 1988.9}, {"week_start": "2026-04-13", "value": 1988.9}, {"week_start": "2026-04-20", "value": 1988.9}, {"week_start": "2026-04-27", "value": 1136.5}], "hist_supply": [{"week_start": "2025-12-29", "value": 1575.0}, {"week_start": "2026-01-05", "value": 2471.0}, {"week_start": "2026-01-12", "value": 2200.0}, {"week_start": "2026-01-19", "value": 2431.0}, {"week_start": "2026-01-26", "value": 2685.0}, {"week_start": "2026-02-02", "value": 2480.0}, {"week_start": "2026-02-09", "value": 2254.0}, {"week_start": "2026-02-16", "value": 2420.0}, {"week_start": "2026-02-23", "value": 2340.0}, {"week_start": "2026-03-02", "value": 2460.0}, {"week_start": "2026-03-09", "value": 2555.0}, {"week_start": "2026-03-16", "value": 2660.0}, {"week_start": "2026-03-23", "value": 2700.0}, {"week_start": "2026-03-30", "value": 2420.0}, {"week_start": "2026-04-06", "value": 2385.0}, {"week_start": "2026-04-13", "value": 1790.0}, {"week_start": "2026-04-20", "value": 0}, {"week_start": "2026-04-27", "value": 0}], "forecast_demand": [{"week_start": "2026-05-04", "value": 1999.0, "festivals": [], "note": "Heat-yield risk"}, {"week_start": "2026-05-11", "value": 1999.0, "festivals": [], "note": "Heat-yield risk"}, {"week_start": "2026-05-18", "value": 2499.0, "festivals": ["Eid al-Adha (Bakrid)"], "note": "Heat-yield risk"}, {"week_start": "2026-05-25", "value": 2499.0, "festivals": ["Eid al-Adha (Bakrid)"], "note": "Heat-yield risk"}], "forecast_supply": [{"week_start": "2026-05-04", "value": 1319.0, "risks": ["Pre-monsoon greens yield \u219320%"]}, {"week_start": "2026-05-11", "value": 1319.0, "risks": ["Pre-monsoon greens yield \u219320%"]}, {"week_start": "2026-05-18", "value": 1319.0, "risks": ["Pre-monsoon greens yield \u219320%"]}, {"week_start": "2026-05-25", "value": 1319.0, "risks": ["Pre-monsoon greens yield \u219320%"]}], "demand_growth_pct": 26.6, "supply_growth_pct": 26.4, "fc_avg_demand": 2249.0, "fc_avg_supply": 1319.0, "vendor_locations": {"Malur/Sulibele": 37826.0}, "vendors": {"Vijay": 23631.0, "MURALI R": 14195.0}, "factors": {"festivals_demand": [["Ramzan", "Very High \u2014 iftar"], ["Eid", "High"], ["Summer chutneys", "Constant"]], "weather": "Extremely heat-sensitive. May-Jun yield drops 30-40%. Wilts in transit.", "harvest_origin": ["Karnataka peri-urban (Hosakote)", "Andhra Pradesh"], "monsoon_impact": "Fungal rot risk. Cold chain mandatory.", "disruption": ["Daily-source \u2014 no buffer", "Pre-monsoon supply gap"], "fuel_sensitivity": "High"}, "demand_total_3m": 24558, "supply_total": 37826.0}, "Tomato Hybrid": {"category": "Vegetables", "tier": "High", "decision": "Keep", "monthly_demand": {"jan": 8717, "feb": 7306, "mar": 8029}, "hist_demand": [{"week_start": "2025-12-29", "value": 1124.8}, {"week_start": "2026-01-05", "value": 1968.4}, {"week_start": "2026-01-12", "value": 1968.4}, {"week_start": "2026-01-19", "value": 1968.4}, {"week_start": "2026-01-26", "value": 1948.1}, {"week_start": "2026-02-02", "value": 1826.5}, {"week_start": "2026-02-09", "value": 1826.5}, {"week_start": "2026-02-16", "value": 1826.5}, {"week_start": "2026-02-23", "value": 1824.6}, {"week_start": "2026-03-02", "value": 1813.0}, {"week_start": "2026-03-09", "value": 1813.0}, {"week_start": "2026-03-16", "value": 1813.0}, {"week_start": "2026-03-23", "value": 1813.0}, {"week_start": "2026-03-30", "value": 1813.0}, {"week_start": "2026-04-06", "value": 1813.0}, {"week_start": "2026-04-13", "value": 1813.0}, {"week_start": "2026-04-20", "value": 1813.0}, {"week_start": "2026-04-27", "value": 1036.0}], "hist_supply": [{"week_start": "2025-12-29", "value": 1510.0}, {"week_start": "2026-01-05", "value": 2817.0}, {"week_start": "2026-01-12", "value": 2446.0}, {"week_start": "2026-01-19", "value": 2710.0}, {"week_start": "2026-01-26", "value": 2700.0}, {"week_start": "2026-02-02", "value": 2912.0}, {"week_start": "2026-02-09", "value": 2720.0}, {"week_start": "2026-02-16", "value": 2790.0}, {"week_start": "2026-02-23", "value": 2400.0}, {"week_start": "2026-03-02", "value": 2740.0}, {"week_start": "2026-03-09", "value": 2774.0}, {"week_start": "2026-03-16", "value": 2780.0}, {"week_start": "2026-03-23", "value": 2650.0}, {"week_start": "2026-03-30", "value": 2570.0}, {"week_start": "2026-04-06", "value": 2620.0}, {"week_start": "2026-04-13", "value": 2010.0}, {"week_start": "2026-04-20", "value": 0}, {"week_start": "2026-04-27", "value": 0}], "forecast_demand": [{"week_start": "2026-05-04", "value": 2364.0, "festivals": ["Karnataka Wedding Season"], "note": ""}, {"week_start": "2026-05-11", "value": 2364.0, "festivals": ["Karnataka Wedding Season"], "note": ""}, {"week_start": "2026-05-18", "value": 2955.0, "festivals": ["Eid al-Adha (Bakrid)", "Karnataka Wedding Season"], "note": ""}, {"week_start": "2026-05-25", "value": 2955.0, "festivals": ["Eid al-Adha (Bakrid)", "Karnataka Wedding Season"], "note": ""}], "forecast_supply": [{"week_start": "2026-05-04", "value": 1620.0, "risks": ["Pre-monsoon fruit-drop risk"]}, {"week_start": "2026-05-11", "value": 1620.0, "risks": ["Pre-monsoon fruit-drop risk"]}, {"week_start": "2026-05-18", "value": 1620.0, "risks": ["Pre-monsoon fruit-drop risk"]}, {"week_start": "2026-05-25", "value": 1620.0, "risks": ["Pre-monsoon fruit-drop risk"]}], "demand_growth_pct": 64.3, "supply_growth_pct": 40.0, "fc_avg_demand": 2660.0, "fc_avg_supply": 1620.0, "vendor_locations": {"Kolar": 16047.0, "Chikkaballapur": 11951.0, "Goravigere": 12131.0, "Hosakote": 950.0, "Near Safal": 70.0}, "vendors": {"Amaresh N F&V": 16047.0, "Manohara S": 11951.0, "TILAKSHA'S AGRO FARMS F&V": 12131.0, "SL Veggies": 950.0, "LB Salesmart Private Limited KA": 70.0}, "factors": {"festivals_demand": [["Wedding May-Jun", "High"], ["Eid", "High"]], "weather": "Same as Natti \u2014 pre-monsoon fruit-drop.", "harvest_origin": ["Karnataka (Kolar, Chikkaballapur)", "Andhra Pradesh (Madanapalle)", "Maharashtra"], "monsoon_impact": "Sep-Oct flooding disruption. 2024 Kolar floods reference.", "disruption": ["Madanapalle vs Kolar arbitrage", "NEH-belt entry of hybrid varieties"], "fuel_sensitivity": "Low-Med"}, "demand_total_3m": 24052, "supply_total": 41149.0}, "Cucumber Salad/Hybrid/Green": {"category": "Vegetables", "tier": "High", "decision": "Keep", "monthly_demand": {"jan": 6127, "feb": 5968, "mar": 6518}, "hist_demand": [{"week_start": "2025-12-29", "value": 790.6}, {"week_start": "2026-01-05", "value": 1383.5}, {"week_start": "2026-01-12", "value": 1383.5}, {"week_start": "2026-01-19", "value": 1383.5}, {"week_start": "2026-01-26", "value": 1399.0}, {"week_start": "2026-02-02", "value": 1492.0}, {"week_start": "2026-02-09", "value": 1492.0}, {"week_start": "2026-02-16", "value": 1492.0}, {"week_start": "2026-02-23", "value": 1489.1}, {"week_start": "2026-03-02", "value": 1471.8}, {"week_start": "2026-03-09", "value": 1471.8}, {"week_start": "2026-03-16", "value": 1471.8}, {"week_start": "2026-03-23", "value": 1471.8}, {"week_start": "2026-03-30", "value": 1471.8}, {"week_start": "2026-04-06", "value": 1471.8}, {"week_start": "2026-04-13", "value": 1471.8}, {"week_start": "2026-04-20", "value": 1471.8}, {"week_start": "2026-04-27", "value": 841.0}], "hist_supply": [{"week_start": "2025-12-29", "value": 0}, {"week_start": "2026-01-05", "value": 0}, {"week_start": "2026-01-12", "value": 0}, {"week_start": "2026-01-19", "value": 0}, {"week_start": "2026-01-26", "value": 0}, {"week_start": "2026-02-02", "value": 0}, {"week_start": "2026-02-09", "value": 0}, {"week_start": "2026-02-16", "value": 0}, {"week_start": "2026-02-23", "value": 0}, {"week_start": "2026-03-02", "value": 0}, {"week_start": "2026-03-09", "value": 0}, {"week_start": "2026-03-16", "value": 0}, {"week_start": "2026-03-23", "value": 0}, {"week_start": "2026-03-30", "value": 350.0}, {"week_start": "2026-04-06", "value": 2588.0}, {"week_start": "2026-04-13", "value": 1904.0}, {"week_start": "2026-04-20", "value": 0}, {"week_start": "2026-04-27", "value": 0}], "forecast_demand": [{"week_start": "2026-05-04", "value": 1646.0, "festivals": [], "note": ""}, {"week_start": "2026-05-11", "value": 1646.0, "festivals": [], "note": ""}, {"week_start": "2026-05-18", "value": 1646.0, "festivals": [], "note": ""}, {"week_start": "2026-05-25", "value": 1646.0, "festivals": [], "note": ""}], "forecast_supply": [{"week_start": "2026-05-04", "value": 1210.0, "risks": []}, {"week_start": "2026-05-11", "value": 1210.0, "risks": []}, {"week_start": "2026-05-18", "value": 1210.0, "risks": []}, {"week_start": "2026-05-25", "value": 1210.0, "risks": []}], "demand_growth_pct": 25.3, "supply_growth_pct": 7.7, "fc_avg_demand": 1646.0, "fc_avg_supply": 1210.0, "vendor_locations": {"Malur": 2600.0, "Chikkaballapur": 2242.0}, "vendors": {"Malur Marikambha Mandi F&V": 2600.0, "Manohara S": 2242.0}, "factors": {"festivals_demand": [["Wedding salads", "High May-Jun"], ["Iftar salads", "High Ramzan"]], "weather": "Heat-tolerant. Stable through summer.", "harvest_origin": ["Karnataka (Hosakote, Chikkaballapur)"], "monsoon_impact": "Mild \u2014 water-intensive crop benefits from monsoon.", "disruption": ["Vendor concentration: 2 vendors only"], "fuel_sensitivity": "Low"}, "demand_total_3m": 18613, "supply_total": 4842.0}, "Spinach Leaves": {"category": "Herbs/Greens", "tier": "High", "decision": "Keep", "monthly_demand": {"jan": 6167, "feb": 5753, "mar": 5999}, "hist_demand": [{"week_start": "2025-12-29", "value": 795.7}, {"week_start": "2026-01-05", "value": 1392.5}, {"week_start": "2026-01-12", "value": 1392.5}, {"week_start": "2026-01-19", "value": 1392.5}, {"week_start": "2026-01-26", "value": 1399.1}, {"week_start": "2026-02-02", "value": 1438.3}, {"week_start": "2026-02-09", "value": 1438.3}, {"week_start": "2026-02-16", "value": 1438.3}, {"week_start": "2026-02-23", "value": 1426.3}, {"week_start": "2026-03-02", "value": 1354.6}, {"week_start": "2026-03-09", "value": 1354.6}, {"week_start": "2026-03-16", "value": 1354.6}, {"week_start": "2026-03-23", "value": 1354.6}, {"week_start": "2026-03-30", "value": 1354.6}, {"week_start": "2026-04-06", "value": 1354.6}, {"week_start": "2026-04-13", "value": 1354.6}, {"week_start": "2026-04-20", "value": 1354.6}, {"week_start": "2026-04-27", "value": 774.1}], "hist_supply": [{"week_start": "2025-12-29", "value": 1098.0}, {"week_start": "2026-01-05", "value": 1731.0}, {"week_start": "2026-01-12", "value": 1587.0}, {"week_start": "2026-01-19", "value": 1753.0}, {"week_start": "2026-01-26", "value": 1835.0}, {"week_start": "2026-02-02", "value": 1850.0}, {"week_start": "2026-02-09", "value": 1677.0}, {"week_start": "2026-02-16", "value": 1790.0}, {"week_start": "2026-02-23", "value": 1750.0}, {"week_start": "2026-03-02", "value": 1690.0}, {"week_start": "2026-03-09", "value": 1550.0}, {"week_start": "2026-03-16", "value": 1755.0}, {"week_start": "2026-03-23", "value": 1700.0}, {"week_start": "2026-03-30", "value": 1560.0}, {"week_start": "2026-04-06", "value": 1560.0}, {"week_start": "2026-04-13", "value": 1152.0}, {"week_start": "2026-04-20", "value": 0}, {"week_start": "2026-04-27", "value": 0}], "forecast_demand": [{"week_start": "2026-05-04", "value": 957.0, "festivals": [], "note": "Cool-season SKU off-peak in May"}, {"week_start": "2026-05-11", "value": 957.0, "festivals": [], "note": "Cool-season SKU off-peak in May"}, {"week_start": "2026-05-18", "value": 957.0, "festivals": [], "note": "Cool-season SKU off-peak in May"}, {"week_start": "2026-05-25", "value": 957.0, "festivals": [], "note": "Cool-season SKU off-peak in May"}], "forecast_supply": [{"week_start": "2026-05-04", "value": 854.0, "risks": ["Pre-monsoon greens yield \u219320%"]}, {"week_start": "2026-05-11", "value": 854.0, "risks": ["Pre-monsoon greens yield \u219320%"]}, {"week_start": "2026-05-18", "value": 854.0, "risks": ["Pre-monsoon greens yield \u219320%"]}, {"week_start": "2026-05-25", "value": 854.0, "risks": ["Pre-monsoon greens yield \u219320%"]}], "demand_growth_pct": -20.9, "supply_growth_pct": 26.0, "fc_avg_demand": 957.0, "fc_avg_supply": 854.0, "vendor_locations": {"Malur/Sulibele": 26038.0}, "vendors": {"Vijay": 16961.0, "MURALI R": 9077.0}, "factors": {"festivals_demand": [["Lent/Sankashti", "Med"], ["Daily greens", "Constant"]], "weather": "Cool-season crop. May-Jun yields halve. Peak Oct-Feb.", "harvest_origin": ["Karnataka peri-urban (Hosakote)", "Punjab (winter)"], "monsoon_impact": "Fungal rot risk. Ethylene-sensitive.", "disruption": ["Daily-source SKU", "Summer supply gap May-Jun"], "fuel_sensitivity": "Med"}, "demand_total_3m": 17919, "supply_total": 26038.0}, "Methi Leaves": {"category": "Herbs/Greens", "tier": "High", "decision": "Keep", "monthly_demand": {"jan": 5543, "feb": 5264, "mar": 5533}, "hist_demand": [{"week_start": "2025-12-29", "value": 715.2}, {"week_start": "2026-01-05", "value": 1251.6}, {"week_start": "2026-01-12", "value": 1251.6}, {"week_start": "2026-01-19", "value": 1251.6}, {"week_start": "2026-01-26", "value": 1260.8}, {"week_start": "2026-02-02", "value": 1316.0}, {"week_start": "2026-02-09", "value": 1316.0}, {"week_start": "2026-02-16", "value": 1316.0}, {"week_start": "2026-02-23", "value": 1306.5}, {"week_start": "2026-03-02", "value": 1249.4}, {"week_start": "2026-03-09", "value": 1249.4}, {"week_start": "2026-03-16", "value": 1249.4}, {"week_start": "2026-03-23", "value": 1249.4}, {"week_start": "2026-03-30", "value": 1249.4}, {"week_start": "2026-04-06", "value": 1249.4}, {"week_start": "2026-04-13", "value": 1249.4}, {"week_start": "2026-04-20", "value": 1249.4}, {"week_start": "2026-04-27", "value": 713.9}], "hist_supply": [{"week_start": "2025-12-29", "value": 884.0}, {"week_start": "2026-01-05", "value": 1463.0}, {"week_start": "2026-01-12", "value": 1420.0}, {"week_start": "2026-01-19", "value": 1572.0}, {"week_start": "2026-01-26", "value": 1607.0}, {"week_start": "2026-02-02", "value": 1650.0}, {"week_start": "2026-02-09", "value": 1628.0}, {"week_start": "2026-02-16", "value": 1590.0}, {"week_start": "2026-02-23", "value": 1540.0}, {"week_start": "2026-03-02", "value": 1500.0}, {"week_start": "2026-03-09", "value": 1380.0}, {"week_start": "2026-03-16", "value": 1540.0}, {"week_start": "2026-03-23", "value": 1470.0}, {"week_start": "2026-03-30", "value": 1440.0}, {"week_start": "2026-04-06", "value": 1471.0}, {"week_start": "2026-04-13", "value": 1090.0}, {"week_start": "2026-04-20", "value": 0}, {"week_start": "2026-04-27", "value": 0}], "forecast_demand": [{"week_start": "2026-05-04", "value": 1100.0, "festivals": [], "note": "Summer dip"}, {"week_start": "2026-05-11", "value": 1100.0, "festivals": [], "note": "Summer dip"}, {"week_start": "2026-05-18", "value": 1100.0, "festivals": [], "note": "Summer dip"}, {"week_start": "2026-05-25", "value": 1100.0, "festivals": [], "note": "Summer dip"}], "forecast_supply": [{"week_start": "2026-05-04", "value": 800.0, "risks": ["Pre-monsoon greens yield \u219320%"]}, {"week_start": "2026-05-11", "value": 800.0, "risks": ["Pre-monsoon greens yield \u219320%"]}, {"week_start": "2026-05-18", "value": 800.0, "risks": ["Pre-monsoon greens yield \u219320%"]}, {"week_start": "2026-05-25", "value": 800.0, "risks": ["Pre-monsoon greens yield \u219320%"]}], "demand_growth_pct": -1.4, "supply_growth_pct": 25.0, "fc_avg_demand": 1100.0, "fc_avg_supply": 800.0, "vendor_locations": {"Malur/Sulibele": 23245.0}, "vendors": {"Vijay": 15034.0, "MURALI R": 8211.0}, "factors": {"festivals_demand": [["Daily NI cooking", "Constant"], ["Wedding parathas", "Med"]], "weather": "Cool-season. Summer yields drop 30%.", "harvest_origin": ["Karnataka peri-urban", "Rajasthan (winter peak)"], "monsoon_impact": "Yield recovers post-monsoon.", "disruption": ["Daily-source"], "fuel_sensitivity": "Med"}, "demand_total_3m": 16340, "supply_total": 23245.0}, "Sweet Corn": {"category": "Vegetables", "tier": "High", "decision": "Keep", "monthly_demand": {"jan": 5567, "feb": 4384, "mar": 4614}, "hist_demand": [{"week_start": "2025-12-29", "value": 718.3}, {"week_start": "2026-01-05", "value": 1257.1}, {"week_start": "2026-01-12", "value": 1257.1}, {"week_start": "2026-01-19", "value": 1257.1}, {"week_start": "2026-01-26", "value": 1234.1}, {"week_start": "2026-02-02", "value": 1096.0}, {"week_start": "2026-02-09", "value": 1096.0}, {"week_start": "2026-02-16", "value": 1096.0}, {"week_start": "2026-02-23", "value": 1088.3}, {"week_start": "2026-03-02", "value": 1041.9}, {"week_start": "2026-03-09", "value": 1041.9}, {"week_start": "2026-03-16", "value": 1041.9}, {"week_start": "2026-03-23", "value": 1041.9}, {"week_start": "2026-03-30", "value": 1041.9}, {"week_start": "2026-04-06", "value": 1041.9}, {"week_start": "2026-04-13", "value": 1041.9}, {"week_start": "2026-04-20", "value": 1041.9}, {"week_start": "2026-04-27", "value": 595.4}], "hist_supply": [{"week_start": "2025-12-29", "value": 855.0}, {"week_start": "2026-01-05", "value": 1627.0}, {"week_start": "2026-01-12", "value": 1782.0}, {"week_start": "2026-01-19", "value": 1660.0}, {"week_start": "2026-01-26", "value": 1581.0}, {"week_start": "2026-02-02", "value": 1560.0}, {"week_start": "2026-02-09", "value": 1573.0}, {"week_start": "2026-02-16", "value": 1540.0}, {"week_start": "2026-02-23", "value": 1400.0}, {"week_start": "2026-03-02", "value": 1380.0}, {"week_start": "2026-03-09", "value": 1242.0}, {"week_start": "2026-03-16", "value": 1205.0}, {"week_start": "2026-03-23", "value": 1300.0}, {"week_start": "2026-03-30", "value": 1300.0}, {"week_start": "2026-04-06", "value": 1317.0}, {"week_start": "2026-04-13", "value": 768.0}, {"week_start": "2026-04-20", "value": 0}, {"week_start": "2026-04-27", "value": 0}], "forecast_demand": [{"week_start": "2026-05-04", "value": 1023.0, "festivals": [], "note": ""}, {"week_start": "2026-05-11", "value": 1023.0, "festivals": [], "note": ""}, {"week_start": "2026-05-18", "value": 1023.0, "festivals": [], "note": ""}, {"week_start": "2026-05-25", "value": 1023.0, "festivals": [], "note": ""}], "forecast_supply": [{"week_start": "2026-05-04", "value": 846.0, "risks": []}, {"week_start": "2026-05-11", "value": 846.0, "risks": []}, {"week_start": "2026-05-18", "value": 846.0, "risks": []}, {"week_start": "2026-05-25", "value": 846.0, "risks": []}], "demand_growth_pct": 10.0, "supply_growth_pct": 62.3, "fc_avg_demand": 1023.0, "fc_avg_supply": 846.0, "vendor_locations": {"Hosakote": 21895.0, "Safal": 195.0}, "vendors": {"SURESH B S/FARMER FRUITS AND VEGETABLES": 21895.0, "All Seasons F&V": 195.0}, "factors": {"festivals_demand": [["Monsoon snacks", "High Jul-Sep"], ["Movie/cafe channels", "Constant"]], "weather": "Pre-monsoon peak harvest. Mar-Jun strong supply.", "harvest_origin": ["Karnataka (Davangere, Chitradurga)", "Tamil Nadu"], "monsoon_impact": "Peak demand DURING monsoon \u2014 Jul-Sep is upside.", "disruption": ["Stem borer pest May-Jul", "Karnataka-Maharashtra arbitrage"], "fuel_sensitivity": "Med"}, "demand_total_3m": 14565, "supply_total": 22090.0}, "Drumstick": {"category": "Vegetables", "tier": "High", "decision": "Keep", "monthly_demand": {"jan": 401, "feb": 3229, "mar": 8279}, "hist_demand": [{"week_start": "2025-12-29", "value": 51.7}, {"week_start": "2026-01-05", "value": 90.5}, {"week_start": "2026-01-12", "value": 90.5}, {"week_start": "2026-01-19", "value": 90.5}, {"week_start": "2026-01-26", "value": 192.9}, {"week_start": "2026-02-02", "value": 807.2}, {"week_start": "2026-02-09", "value": 807.2}, {"week_start": "2026-02-16", "value": 807.2}, {"week_start": "2026-02-23", "value": 959.0}, {"week_start": "2026-03-02", "value": 1869.5}, {"week_start": "2026-03-09", "value": 1869.5}, {"week_start": "2026-03-16", "value": 1869.5}, {"week_start": "2026-03-23", "value": 1869.5}, {"week_start": "2026-03-30", "value": 1869.5}, {"week_start": "2026-04-06", "value": 1869.5}, {"week_start": "2026-04-13", "value": 1869.5}, {"week_start": "2026-04-20", "value": 1869.5}, {"week_start": "2026-04-27", "value": 1068.3}], "hist_supply": [{"week_start": "2025-12-29", "value": 221.0}, {"week_start": "2026-01-05", "value": 487.0}, {"week_start": "2026-01-12", "value": 0}, {"week_start": "2026-01-19", "value": 100.0}, {"week_start": "2026-01-26", "value": 625.0}, {"week_start": "2026-02-02", "value": 1040.0}, {"week_start": "2026-02-09", "value": 880.0}, {"week_start": "2026-02-16", "value": 1160.0}, {"week_start": "2026-02-23", "value": 1050.0}, {"week_start": "2026-03-02", "value": 1390.0}, {"week_start": "2026-03-09", "value": 1760.0}, {"week_start": "2026-03-16", "value": 2460.0}, {"week_start": "2026-03-23", "value": 3650.0}, {"week_start": "2026-03-30", "value": 4150.0}, {"week_start": "2026-04-06", "value": 6080.0}, {"week_start": "2026-04-13", "value": 3900.0}, {"week_start": "2026-04-20", "value": 0}, {"week_start": "2026-04-27", "value": 0}], "forecast_demand": [{"week_start": "2026-05-04", "value": 5286.0, "festivals": [], "note": ""}, {"week_start": "2026-05-11", "value": 5286.0, "festivals": [], "note": ""}, {"week_start": "2026-05-18", "value": 5286.0, "festivals": [], "note": ""}, {"week_start": "2026-05-25", "value": 5286.0, "festivals": [], "note": ""}], "forecast_supply": [{"week_start": "2026-05-04", "value": 4062.0, "risks": ["TN dependency (cyclone/Cauvery risk)", "TN harvest peak (upside)"]}, {"week_start": "2026-05-11", "value": 4062.0, "risks": ["TN dependency (cyclone/Cauvery risk)", "TN harvest peak (upside)"]}, {"week_start": "2026-05-18", "value": 4062.0, "risks": ["TN dependency (cyclone/Cauvery risk)", "TN harvest peak (upside)"]}, {"week_start": "2026-05-25", "value": 4062.0, "risks": ["TN dependency (cyclone/Cauvery risk)", "TN harvest peak (upside)"]}], "demand_growth_pct": 216.7, "supply_growth_pct": 62.8, "fc_avg_demand": 5286.0, "fc_avg_supply": 4062.0, "vendor_locations": {"TN": 28853.0, "Safal": 100.0}, "vendors": {"Sakthivel P": 28853.0, "Md Ibrahim Fruits & Vegetables": 100.0}, "factors": {"festivals_demand": [["Sambar staple", "Constant"], ["Wedding season", "High"]], "weather": "\u26a0 FLAG: Mar 8,279 vs Jan 401 (20x). Likely seasonal harvest peak Mar-Jun in TN.", "harvest_origin": ["Tamil Nadu (Dindigul, Theni \u2014 99.7% of supply)", "Karnataka (limited)"], "monsoon_impact": "Post-monsoon Sep-Oct lull. Peak Mar-Jun aligns with wedding sambar demand.", "disruption": ["TN single-state dependence \u2014 Cauvery dispute, TN bandhs", "Cyclone risk on TN coast"], "fuel_sensitivity": "Very High \u2014 TN-only supply, 400km+ haul"}, "demand_total_3m": 11909, "supply_total": 28953.0}, "Papaya": {"category": "Fruits", "tier": "High", "decision": "Keep", "monthly_demand": {"jan": 4027, "feb": 3561, "mar": 3627}, "hist_demand": [{"week_start": "2025-12-29", "value": 519.6}, {"week_start": "2026-01-05", "value": 909.3}, {"week_start": "2026-01-12", "value": 909.3}, {"week_start": "2026-01-19", "value": 909.3}, {"week_start": "2026-01-26", "value": 906.6}, {"week_start": "2026-02-02", "value": 890.2}, {"week_start": "2026-02-09", "value": 890.2}, {"week_start": "2026-02-16", "value": 890.2}, {"week_start": "2026-02-23", "value": 880.1}, {"week_start": "2026-03-02", "value": 819.0}, {"week_start": "2026-03-09", "value": 819.0}, {"week_start": "2026-03-16", "value": 819.0}, {"week_start": "2026-03-23", "value": 819.0}, {"week_start": "2026-03-30", "value": 819.0}, {"week_start": "2026-04-06", "value": 819.0}, {"week_start": "2026-04-13", "value": 819.0}, {"week_start": "2026-04-20", "value": 819.0}, {"week_start": "2026-04-27", "value": 468.0}], "hist_supply": [{"week_start": "2025-12-29", "value": 673.0}, {"week_start": "2026-01-05", "value": 1382.0}, {"week_start": "2026-01-12", "value": 1356.0}, {"week_start": "2026-01-19", "value": 1484.0}, {"week_start": "2026-01-26", "value": 1313.0}, {"week_start": "2026-02-02", "value": 1220.0}, {"week_start": "2026-02-09", "value": 1259.0}, {"week_start": "2026-02-16", "value": 1250.0}, {"week_start": "2026-02-23", "value": 1388.0}, {"week_start": "2026-03-02", "value": 1460.0}, {"week_start": "2026-03-09", "value": 1438.0}, {"week_start": "2026-03-16", "value": 1355.0}, {"week_start": "2026-03-23", "value": 1260.0}, {"week_start": "2026-03-30", "value": 1110.0}, {"week_start": "2026-04-06", "value": 1072.0}, {"week_start": "2026-04-13", "value": 717.0}, {"week_start": "2026-04-20", "value": 0}, {"week_start": "2026-04-27", "value": 0}], "forecast_demand": [{"week_start": "2026-05-04", "value": 765.0, "festivals": [], "note": ""}, {"week_start": "2026-05-11", "value": 765.0, "festivals": [], "note": ""}, {"week_start": "2026-05-18", "value": 765.0, "festivals": [], "note": ""}, {"week_start": "2026-05-25", "value": 765.0, "festivals": [], "note": ""}], "forecast_supply": [{"week_start": "2026-05-04", "value": 725.0, "risks": []}, {"week_start": "2026-05-11", "value": 725.0, "risks": []}, {"week_start": "2026-05-18", "value": 725.0, "risks": []}, {"week_start": "2026-05-25", "value": 725.0, "risks": []}], "demand_growth_pct": 4.6, "supply_growth_pct": 62.1, "fc_avg_demand": 765.0, "fc_avg_supply": 725.0, "vendor_locations": {"Safal": 19737.0}, "vendors": {"Parameshwarappa": 19267.0, "Md Ibrahim Fruits & Vegetables": 470.0}, "factors": {"festivals_demand": [["Daily fruit", "Constant"]], "weather": "Year-round. Heat-tolerant.", "harvest_origin": ["Karnataka (Kolar, Chikkaballapur)", "Andhra Pradesh", "Tamil Nadu"], "monsoon_impact": "Ringspot virus risk Jul-Sep.", "disruption": ["Ringspot virus outbreaks", "Single-vendor location concentration"], "fuel_sensitivity": "Low"}, "demand_total_3m": 11215, "supply_total": 19737.0}, "Mushroom": {"category": "Others", "tier": "Medium", "decision": "Keep", "monthly_demand": {"jan": 3429, "feb": 2858, "mar": 2981}, "hist_demand": [{"week_start": "2025-12-29", "value": 442.5}, {"week_start": "2026-01-05", "value": 774.3}, {"week_start": "2026-01-12", "value": 774.3}, {"week_start": "2026-01-19", "value": 774.3}, {"week_start": "2026-01-26", "value": 765.7}, {"week_start": "2026-02-02", "value": 714.5}, {"week_start": "2026-02-09", "value": 714.5}, {"week_start": "2026-02-16", "value": 714.5}, {"week_start": "2026-02-23", "value": 708.6}, {"week_start": "2026-03-02", "value": 673.1}, {"week_start": "2026-03-09", "value": 673.1}, {"week_start": "2026-03-16", "value": 673.1}, {"week_start": "2026-03-23", "value": 673.1}, {"week_start": "2026-03-30", "value": 673.1}, {"week_start": "2026-04-06", "value": 673.1}, {"week_start": "2026-04-13", "value": 673.1}, {"week_start": "2026-04-20", "value": 673.1}, {"week_start": "2026-04-27", "value": 384.6}], "hist_supply": [{"week_start": "2025-12-29", "value": 650.0}, {"week_start": "2026-01-05", "value": 965.0}, {"week_start": "2026-01-12", "value": 850.0}, {"week_start": "2026-01-19", "value": 910.0}, {"week_start": "2026-01-26", "value": 1040.0}, {"week_start": "2026-02-02", "value": 990.0}, {"week_start": "2026-02-09", "value": 860.0}, {"week_start": "2026-02-16", "value": 880.0}, {"week_start": "2026-02-23", "value": 930.0}, {"week_start": "2026-03-02", "value": 920.0}, {"week_start": "2026-03-09", "value": 888.0}, {"week_start": "2026-03-16", "value": 895.0}, {"week_start": "2026-03-23", "value": 870.0}, {"week_start": "2026-03-30", "value": 860.0}, {"week_start": "2026-04-06", "value": 866.0}, {"week_start": "2026-04-13", "value": 530.0}, {"week_start": "2026-04-20", "value": 0}, {"week_start": "2026-04-27", "value": 0}], "forecast_demand": [{"week_start": "2026-05-04", "value": 621.0, "festivals": [], "note": ""}, {"week_start": "2026-05-11", "value": 621.0, "festivals": [], "note": ""}, {"week_start": "2026-05-18", "value": 621.0, "festivals": [], "note": ""}, {"week_start": "2026-05-25", "value": 621.0, "festivals": [], "note": ""}], "forecast_supply": [{"week_start": "2026-05-04", "value": 564.0, "risks": []}, {"week_start": "2026-05-11", "value": 564.0, "risks": []}, {"week_start": "2026-05-18", "value": 564.0, "risks": []}, {"week_start": "2026-05-25", "value": 564.0, "risks": []}], "demand_growth_pct": 3.3, "supply_growth_pct": 61.6, "fc_avg_demand": 621.0, "fc_avg_supply": 564.0, "vendor_locations": {"Hosakote": 13844.0, "Nelamangala": 60.0}, "vendors": {"GREEN AND WHITE - KA": 13844.0, "DHANALAXMI ENTERPRISES KA": 60.0}, "factors": {"festivals_demand": [["Premium/cafe channel", "Constant"], ["Lent (vegetarian)", "Med"]], "weather": "Climate-controlled \u2014 least weather-exposed. Summer cooling cost up.", "harvest_origin": ["Karnataka (Hosakote \u2014 controlled-environment)", "Himachal Pradesh"], "monsoon_impact": "Mostly insulated.", "disruption": ["Power outages at growing facility", "Cold chain critical"], "fuel_sensitivity": "Low"}, "demand_total_3m": 9268, "supply_total": 13904.0}, "Carrot Ooty": {"category": "Vegetables", "tier": "Medium", "decision": "Keep", "monthly_demand": {"jan": 2719, "feb": 2969, "mar": 2899}, "hist_demand": [{"week_start": "2025-12-29", "value": 350.8}, {"week_start": "2026-01-05", "value": 614.0}, {"week_start": "2026-01-12", "value": 614.0}, {"week_start": "2026-01-19", "value": 614.0}, {"week_start": "2026-01-26", "value": 632.3}, {"week_start": "2026-02-02", "value": 742.3}, {"week_start": "2026-02-09", "value": 742.3}, {"week_start": "2026-02-16", "value": 742.3}, {"week_start": "2026-02-23", "value": 729.7}, {"week_start": "2026-03-02", "value": 654.6}, {"week_start": "2026-03-09", "value": 654.6}, {"week_start": "2026-03-16", "value": 654.6}, {"week_start": "2026-03-23", "value": 654.6}, {"week_start": "2026-03-30", "value": 654.6}, {"week_start": "2026-04-06", "value": 654.6}, {"week_start": "2026-04-13", "value": 654.6}, {"week_start": "2026-04-20", "value": 654.6}, {"week_start": "2026-04-27", "value": 374.1}], "hist_supply": [{"week_start": "2025-12-29", "value": 433.0}, {"week_start": "2026-01-05", "value": 815.0}, {"week_start": "2026-01-12", "value": 746.0}, {"week_start": "2026-01-19", "value": 776.0}, {"week_start": "2026-01-26", "value": 810.0}, {"week_start": "2026-02-02", "value": 828.0}, {"week_start": "2026-02-09", "value": 830.0}, {"week_start": "2026-02-16", "value": 870.0}, {"week_start": "2026-02-23", "value": 886.0}, {"week_start": "2026-03-02", "value": 900.0}, {"week_start": "2026-03-09", "value": 897.0}, {"week_start": "2026-03-16", "value": 907.0}, {"week_start": "2026-03-23", "value": 910.0}, {"week_start": "2026-03-30", "value": 910.0}, {"week_start": "2026-04-06", "value": 989.0}, {"week_start": "2026-04-13", "value": 727.0}, {"week_start": "2026-04-20", "value": 0}, {"week_start": "2026-04-27", "value": 0}], "forecast_demand": [{"week_start": "2026-05-04", "value": 876.0, "festivals": ["Karnataka Wedding Season"], "note": ""}, {"week_start": "2026-05-11", "value": 876.0, "festivals": ["Karnataka Wedding Season"], "note": ""}, {"week_start": "2026-05-18", "value": 876.0, "festivals": ["Karnataka Wedding Season"], "note": ""}, {"week_start": "2026-05-25", "value": 876.0, "festivals": ["Karnataka Wedding Season"], "note": ""}], "forecast_supply": [{"week_start": "2026-05-04", "value": 656.0, "risks": []}, {"week_start": "2026-05-11", "value": 656.0, "risks": []}, {"week_start": "2026-05-18", "value": 656.0, "risks": []}, {"week_start": "2026-05-25", "value": 656.0, "risks": []}], "demand_growth_pct": 49.9, "supply_growth_pct": 52.9, "fc_avg_demand": 876.0, "fc_avg_supply": 656.0, "vendor_locations": {"City market": 13234.0}, "vendors": {"STALIN F&V": 13234.0}, "factors": {"festivals_demand": [["Wedding salads", "High May-Jun"], ["Daily", "Constant"]], "weather": "High-altitude origin (Ooty 2,200m). Monsoon = peak season.", "harvest_origin": ["Tamil Nadu (Ooty, Nilgiris)", "Karnataka (limited Hassan)"], "monsoon_impact": "Nilgiris landslides Jul-Sep can cut off supply.", "disruption": ["Single-vendor risk", "Nilgiris landslides", "Ooty road closures"], "fuel_sensitivity": "High \u2014 300km+ from Ooty"}, "demand_total_3m": 8587, "supply_total": 13234.0}, "Chilli Green (Small)": {"category": "Vegetables", "tier": "Medium", "decision": "Keep", "monthly_demand": {"jan": 2812, "feb": 2401, "mar": 2643}, "hist_demand": [{"week_start": "2025-12-29", "value": 362.8}, {"week_start": "2026-01-05", "value": 635.0}, {"week_start": "2026-01-12", "value": 635.0}, {"week_start": "2026-01-19", "value": 635.0}, {"week_start": "2026-01-26", "value": 630.0}, {"week_start": "2026-02-02", "value": 600.2}, {"week_start": "2026-02-09", "value": 600.2}, {"week_start": "2026-02-16", "value": 600.2}, {"week_start": "2026-02-23", "value": 599.8}, {"week_start": "2026-03-02", "value": 596.8}, {"week_start": "2026-03-09", "value": 596.8}, {"week_start": "2026-03-16", "value": 596.8}, {"week_start": "2026-03-23", "value": 596.8}, {"week_start": "2026-03-30", "value": 596.8}, {"week_start": "2026-04-06", "value": 596.8}, {"week_start": "2026-04-13", "value": 596.8}, {"week_start": "2026-04-20", "value": 596.8}, {"week_start": "2026-04-27", "value": 341.0}], "hist_supply": [{"week_start": "2025-12-29", "value": 552.0}, {"week_start": "2026-01-05", "value": 934.0}, {"week_start": "2026-01-12", "value": 937.0}, {"week_start": "2026-01-19", "value": 905.0}, {"week_start": "2026-01-26", "value": 930.0}, {"week_start": "2026-02-02", "value": 877.0}, {"week_start": "2026-02-09", "value": 839.0}, {"week_start": "2026-02-16", "value": 870.0}, {"week_start": "2026-02-23", "value": 868.0}, {"week_start": "2026-03-02", "value": 890.0}, {"week_start": "2026-03-09", "value": 848.0}, {"week_start": "2026-03-16", "value": 885.0}, {"week_start": "2026-03-23", "value": 870.0}, {"week_start": "2026-03-30", "value": 840.0}, {"week_start": "2026-04-06", "value": 864.0}, {"week_start": "2026-04-13", "value": 576.0}, {"week_start": "2026-04-20", "value": 0}, {"week_start": "2026-04-27", "value": 0}], "forecast_demand": [{"week_start": "2026-05-04", "value": 609.0, "festivals": [], "note": ""}, {"week_start": "2026-05-11", "value": 609.0, "festivals": [], "note": ""}, {"week_start": "2026-05-18", "value": 609.0, "festivals": [], "note": ""}, {"week_start": "2026-05-25", "value": 609.0, "festivals": [], "note": ""}], "forecast_supply": [{"week_start": "2026-05-04", "value": 570.0, "risks": []}, {"week_start": "2026-05-11", "value": 570.0, "risks": []}, {"week_start": "2026-05-18", "value": 570.0, "risks": []}, {"week_start": "2026-05-25", "value": 570.0, "risks": []}], "demand_growth_pct": 14.3, "supply_growth_pct": 58.3, "fc_avg_demand": 609.0, "fc_avg_supply": 570.0, "vendor_locations": {"Chikkaballapur": 7022.0, "Malur": 6463.0}, "vendors": {"Manohara S": 7022.0, "Malur Marikambha Mandi F&V": 6463.0}, "factors": {"festivals_demand": [["Daily SI staple", "Constant"], ["Pickle season May-Jun", "High"]], "weather": "Heat-tolerant.", "harvest_origin": ["Karnataka (Bidar, Bagalkot)", "Andhra Pradesh (Guntur)"], "monsoon_impact": "Thrips/mites May-Jul", "disruption": ["Guntur arbitrage", "Pesticide residue rejections"], "fuel_sensitivity": "Med"}, "demand_total_3m": 7856, "supply_total": 13485.0}, "Namdhari Watermelon, Loose": {"category": "Vegetables", "tier": "Medium", "decision": "Review", "monthly_demand": {"jan": 0, "feb": 2087, "mar": 4845}, "hist_demand": [{"week_start": "2025-12-29", "value": 0.0}, {"week_start": "2026-01-05", "value": 0.0}, {"week_start": "2026-01-12", "value": 0.0}, {"week_start": "2026-01-19", "value": 0.0}, {"week_start": "2026-01-26", "value": 74.5}, {"week_start": "2026-02-02", "value": 521.8}, {"week_start": "2026-02-09", "value": 521.8}, {"week_start": "2026-02-16", "value": 521.8}, {"week_start": "2026-02-23", "value": 603.5}, {"week_start": "2026-03-02", "value": 1094.0}, {"week_start": "2026-03-09", "value": 1094.0}, {"week_start": "2026-03-16", "value": 1094.0}, {"week_start": "2026-03-23", "value": 1094.0}, {"week_start": "2026-03-30", "value": 1094.0}, {"week_start": "2026-04-06", "value": 1094.0}, {"week_start": "2026-04-13", "value": 1094.0}, {"week_start": "2026-04-20", "value": 1094.0}, {"week_start": "2026-04-27", "value": 625.2}], "hist_supply": [{"week_start": "2025-12-29", "value": 0}, {"week_start": "2026-01-05", "value": 0}, {"week_start": "2026-01-12", "value": 0}, {"week_start": "2026-01-19", "value": 0}, {"week_start": "2026-01-26", "value": 0}, {"week_start": "2026-02-02", "value": 0}, {"week_start": "2026-02-09", "value": 0}, {"week_start": "2026-02-16", "value": 600.0}, {"week_start": "2026-02-23", "value": 2524.0}, {"week_start": "2026-03-02", "value": 2000.0}, {"week_start": "2026-03-09", "value": 2180.0}, {"week_start": "2026-03-16", "value": 2310.0}, {"week_start": "2026-03-23", "value": 2000.0}, {"week_start": "2026-03-30", "value": 1500.0}, {"week_start": "2026-04-06", "value": 400.0}, {"week_start": "2026-04-13", "value": 0}, {"week_start": "2026-04-20", "value": 0}, {"week_start": "2026-04-27", "value": 0}], "forecast_demand": [{"week_start": "2026-05-04", "value": 3093.0, "festivals": [], "note": ""}, {"week_start": "2026-05-11", "value": 3093.0, "festivals": [], "note": ""}, {"week_start": "2026-05-18", "value": 3403.0, "festivals": [], "note": ""}, {"week_start": "2026-05-25", "value": 3403.0, "festivals": [], "note": ""}], "forecast_supply": [{"week_start": "2026-05-04", "value": 475.0, "risks": []}, {"week_start": "2026-05-11", "value": 475.0, "risks": []}, {"week_start": "2026-05-18", "value": 475.0, "risks": []}, {"week_start": "2026-05-25", "value": 475.0, "risks": []}], "demand_growth_pct": 232.5, "supply_growth_pct": 375.0, "fc_avg_demand": 3248.0, "fc_avg_supply": 475.0, "vendor_locations": {"Safal": 13114.0, "Near Safal": 400.0}, "vendors": {"A SARASWATHI F&V": 600.0, "Big Cart Fruits(Jeevankumar)": 200.0, "Manjunath WM": 4904.0, "HEALTHY HARVEST": 7410.0, "LB Salesmart Private Limited KA": 400.0}, "factors": {"festivals_demand": [["Summer peak Mar-May", "Very High"], ["Ramzan iftar", "Very High"]], "weather": "Pure summer SKU. May = peak. Jun onward demand collapses with monsoon.", "harvest_origin": ["Karnataka (Bagalkot, Raichur)", "Andhra Pradesh", "Maharashtra (Solapur)"], "monsoon_impact": "Demand collapses with monsoon onset. Procurement must taper Jun.", "disruption": ["Heat damage in transit", "Heavy SKU \u2014 fuel cost high", "Hailstorms (rare)"], "fuel_sensitivity": "Very High \u2014 2kg/piece, weight-sensitive"}, "demand_total_3m": 6932, "supply_total": 13514.0}};
+const ORDER = ["Coriander Leaves Bunch", "Banana Robusta", "Tomato Natti / Local", "Curry leaves", "Potato", "Onion", "Coconut", "Banana Elaichi", "Mint / Pudina Leaves", "Tomato Hybrid", "Cucumber Salad/Hybrid/Green", "Spinach Leaves", "Methi Leaves", "Sweet Corn", "Drumstick", "Papaya", "Mushroom", "Carrot Ooty", "Chilli Green (Small)", "Namdhari Watermelon, Loose"];
+const FACTORS = {"sku_factors": {"Coriander Leaves Bunch": {"festivals_demand": [["Ramzan/Eid", "High \u2014 biryani garnish & chutneys"], ["Wedding season May-Jun", "Med"]], "weather": "Highly heat-sensitive. Apr-Jun yield drops 25-35%. Top-icing & cold chain non-negotiable.", "harvest_origin": ["Karnataka peri-urban (Hosakote, Chikkaballapur)", "Andhra Pradesh (Anantapur)"], "monsoon_impact": "Pre-monsoon (May): supply tight. Monsoon (Jun-Sep): bunch quality drops, fungal risk.", "disruption": ["Wilting in transit if break in cold chain >2hrs", "Daily-source SKU \u2014 no buffer stock"], "fuel_sensitivity": "High \u2014 daily multi-trip from peri-urban farms"}, "Banana Robusta": {"festivals_demand": [["Eid al-Adha (May 27)", "Med"], ["Ganga Dussehra", "Low"], ["Daily pooja staple", "Constant"]], "weather": "Heat-tolerant. Pre-monsoon ripening accelerates \u2014 DC ripening must be staggered.", "harvest_origin": ["Tamil Nadu (Theni, Trichy)", "Andhra Pradesh (Kadapa, Anantapur)", "Maharashtra (Jalgaon)"], "monsoon_impact": "Cyclones in TN/AP coast disrupt rake movement. Monitor IMD South Peninsula bulletins.", "disruption": ["Cyclone risk Apr-Jun in Bay of Bengal", "TN Trichy harvest dip Jul-Aug"], "fuel_sensitivity": "Med \u2014 long-haul truck from TN/AP, diesel exposure"}, "Tomato Natti / Local": {"festivals_demand": [["Wedding season May-Jun", "High \u2014 sambar/rasam staple"], ["Eid", "Med"]], "weather": "Pre-monsoon heat causes fruit-drop. May-Jun = lean season. Prices typically peak.", "harvest_origin": ["Karnataka (Kolar, Chikkaballapur, Hosakote)", "Andhra Pradesh (Madanapalle)"], "monsoon_impact": "Late monsoon flooding (Sep-Oct) destroys Kolar belt. Plan buffer Aug.", "disruption": ["Kolar mandi strikes (rare but high-impact)", "Madanapalle price arbitrage swings"], "fuel_sensitivity": "Low \u2014 short-haul (60-100km)"}, "Curry leaves": {"festivals_demand": [["Daily SI cooking staple", "Constant"], ["Ugadi (Mar)", "Med \u2014 past"]], "weather": "Hardy. Mild dip in peak summer.", "harvest_origin": ["Karnataka peri-urban", "Tamil Nadu (Salem belt)"], "monsoon_impact": "Generally robust through monsoon.", "disruption": ["Pest outbreak risk (whitefly) May-Jul"], "fuel_sensitivity": "Low"}, "Potato": {"festivals_demand": [["Wedding season May-Jun", "High"], ["Eid al-Adha", "High \u2014 biryani"]], "weather": "Cold-storage commodity. May-Jun pulls from Punjab/UP cold storage \u2014 quality declines.", "harvest_origin": ["Punjab (Jalandhar) cold storage", "UP (Agra/Hathras)", "West Bengal", "Karnataka (Hassan rabi)"], "monsoon_impact": "Cold-storage dependence Jul-Oct. Storage rot risk if power outages.", "disruption": ["Cold storage tariff hikes", "Punjab rake disruption", "CIPC sprout-control phase-out"], "fuel_sensitivity": "High \u2014 long-haul rail+road from Punjab/UP"}, "Banana Elaichi": {"festivals_demand": [["Eid", "Med"], ["Premium daily", "Constant"]], "weather": "Heat-tolerant. Smaller acreage = thinner supply buffer.", "harvest_origin": ["Tamil Nadu (Theni)", "Karnataka (Chamarajanagar)"], "monsoon_impact": "Niche varietal \u2014 Cauvery basin disputes can affect supply.", "disruption": ["Limited vendor base (3) = vendor concentration risk"], "fuel_sensitivity": "Med"}, "Onion": {"festivals_demand": [["Wedding season", "Very High"], ["Eid", "Very High"], ["Ramzan", "High"]], "weather": "Maharashtra unseasonal rain = price shock. Pre-monsoon = peak rabi outflow.", "harvest_origin": ["Maharashtra (Nashik, Lasalgaon \u2014 Asia's largest mandi)", "Karnataka (Bagalkot, Gadag)", "Madhya Pradesh"], "monsoon_impact": "Jul-Sep storage rot risk (rabi). Kharif (Oct-Dec) at risk if heavy rain.", "disruption": ["Govt export bans (recent precedent)", "NAFED MSP procurement", "Lasalgaon strikes", "MEP changes"], "fuel_sensitivity": "High \u2014 long-haul from Maharashtra"}, "Coconut": {"festivals_demand": [["Wedding season May-Jun", "Very High"], ["Akshaya Tritiya", "High \u2014 past"], ["Vat Savitri", "Med"], ["Daily pooja", "Constant"]], "weather": "TN/Kerala cyclones disrupt supply. Drought-resilient but yield 12-month lag.", "harvest_origin": ["Tamil Nadu (Pollachi, Coimbatore)", "Kerala", "Karnataka (Tumkur, Hassan)", "Andhra Pradesh (East Godavari)"], "monsoon_impact": "SW monsoon onset (Jun) drives wedding-coconut demand spike vs supply lag.", "disruption": ["Pollachi mandi strikes", "Cauvery water dispute", "Diesel price impact on long-haul", "Cyclone Burevi/Tauktae-class events"], "fuel_sensitivity": "Very High \u2014 Pollachi to Bangalore 350km+"}, "Mint / Pudina Leaves": {"festivals_demand": [["Ramzan", "Very High \u2014 iftar"], ["Eid", "High"], ["Summer chutneys", "Constant"]], "weather": "Extremely heat-sensitive. May-Jun yield drops 30-40%. Wilts in transit.", "harvest_origin": ["Karnataka peri-urban (Hosakote)", "Andhra Pradesh"], "monsoon_impact": "Fungal rot risk. Cold chain mandatory.", "disruption": ["Daily-source \u2014 no buffer", "Pre-monsoon supply gap"], "fuel_sensitivity": "High"}, "Drumstick": {"festivals_demand": [["Sambar staple", "Constant"], ["Wedding season", "High"]], "weather": "\u26a0 FLAG: Mar 8,279 vs Jan 401 (20x). Likely seasonal harvest peak Mar-Jun in TN.", "harvest_origin": ["Tamil Nadu (Dindigul, Theni \u2014 99.7% of supply)", "Karnataka (limited)"], "monsoon_impact": "Post-monsoon Sep-Oct lull. Peak Mar-Jun aligns with wedding sambar demand.", "disruption": ["TN single-state dependence \u2014 Cauvery dispute, TN bandhs", "Cyclone risk on TN coast"], "fuel_sensitivity": "Very High \u2014 TN-only supply, 400km+ haul"}, "Tomato Hybrid": {"festivals_demand": [["Wedding May-Jun", "High"], ["Eid", "High"]], "weather": "Same as Natti \u2014 pre-monsoon fruit-drop.", "harvest_origin": ["Karnataka (Kolar, Chikkaballapur)", "Andhra Pradesh (Madanapalle)", "Maharashtra"], "monsoon_impact": "Sep-Oct flooding disruption. 2024 Kolar floods reference.", "disruption": ["Madanapalle vs Kolar arbitrage", "NEH-belt entry of hybrid varieties"], "fuel_sensitivity": "Low-Med"}, "Cucumber Salad/Hybrid/Green": {"festivals_demand": [["Wedding salads", "High May-Jun"], ["Iftar salads", "High Ramzan"]], "weather": "Heat-tolerant. Stable through summer.", "harvest_origin": ["Karnataka (Hosakote, Chikkaballapur)"], "monsoon_impact": "Mild \u2014 water-intensive crop benefits from monsoon.", "disruption": ["Vendor concentration: 2 vendors only"], "fuel_sensitivity": "Low"}, "Spinach Leaves": {"festivals_demand": [["Lent/Sankashti", "Med"], ["Daily greens", "Constant"]], "weather": "Cool-season crop. May-Jun yields halve. Peak Oct-Feb.", "harvest_origin": ["Karnataka peri-urban (Hosakote)", "Punjab (winter)"], "monsoon_impact": "Fungal rot risk. Ethylene-sensitive.", "disruption": ["Daily-source SKU", "Summer supply gap May-Jun"], "fuel_sensitivity": "Med"}, "Methi Leaves": {"festivals_demand": [["Daily NI cooking", "Constant"], ["Wedding parathas", "Med"]], "weather": "Cool-season. Summer yields drop 30%.", "harvest_origin": ["Karnataka peri-urban", "Rajasthan (winter peak)"], "monsoon_impact": "Yield recovers post-monsoon.", "disruption": ["Daily-source"], "fuel_sensitivity": "Med"}, "Namdhari Watermelon, Loose": {"festivals_demand": [["Summer peak Mar-May", "Very High"], ["Ramzan iftar", "Very High"]], "weather": "Pure summer SKU. May = peak. Jun onward demand collapses with monsoon.", "harvest_origin": ["Karnataka (Bagalkot, Raichur)", "Andhra Pradesh", "Maharashtra (Solapur)"], "monsoon_impact": "Demand collapses with monsoon onset. Procurement must taper Jun.", "disruption": ["Heat damage in transit", "Heavy SKU \u2014 fuel cost high", "Hailstorms (rare)"], "fuel_sensitivity": "Very High \u2014 2kg/piece, weight-sensitive"}, "Sweet Corn": {"festivals_demand": [["Monsoon snacks", "High Jul-Sep"], ["Movie/cafe channels", "Constant"]], "weather": "Pre-monsoon peak harvest. Mar-Jun strong supply.", "harvest_origin": ["Karnataka (Davangere, Chitradurga)", "Tamil Nadu"], "monsoon_impact": "Peak demand DURING monsoon \u2014 Jul-Sep is upside.", "disruption": ["Stem borer pest May-Jul", "Karnataka-Maharashtra arbitrage"], "fuel_sensitivity": "Med"}, "Papaya": {"festivals_demand": [["Daily fruit", "Constant"]], "weather": "Year-round. Heat-tolerant.", "harvest_origin": ["Karnataka (Kolar, Chikkaballapur)", "Andhra Pradesh", "Tamil Nadu"], "monsoon_impact": "Ringspot virus risk Jul-Sep.", "disruption": ["Ringspot virus outbreaks", "Single-vendor location concentration"], "fuel_sensitivity": "Low"}, "Mushroom": {"festivals_demand": [["Premium/cafe channel", "Constant"], ["Lent (vegetarian)", "Med"]], "weather": "Climate-controlled \u2014 least weather-exposed. Summer cooling cost up.", "harvest_origin": ["Karnataka (Hosakote \u2014 controlled-environment)", "Himachal Pradesh"], "monsoon_impact": "Mostly insulated.", "disruption": ["Power outages at growing facility", "Cold chain critical"], "fuel_sensitivity": "Low"}, "Carrot Ooty": {"festivals_demand": [["Wedding salads", "High May-Jun"], ["Daily", "Constant"]], "weather": "High-altitude origin (Ooty 2,200m). Monsoon = peak season.", "harvest_origin": ["Tamil Nadu (Ooty, Nilgiris)", "Karnataka (limited Hassan)"], "monsoon_impact": "Nilgiris landslides Jul-Sep can cut off supply.", "disruption": ["Single-vendor risk", "Nilgiris landslides", "Ooty road closures"], "fuel_sensitivity": "High \u2014 300km+ from Ooty"}, "Chilli Green (Small)": {"festivals_demand": [["Daily SI staple", "Constant"], ["Pickle season May-Jun", "High"]], "weather": "Heat-tolerant.", "harvest_origin": ["Karnataka (Bidar, Bagalkot)", "Andhra Pradesh (Guntur)"], "monsoon_impact": "Thrips/mites May-Jul", "disruption": ["Guntur arbitrage", "Pesticide residue rejections"], "fuel_sensitivity": "Med"}}, "festival_cal": [{"name": "Akshaya Tritiya", "date": "2026-04-19", "impact": "Coconut, Banana", "level": "high"}, {"name": "Buddha Purnima", "date": "2026-05-21", "impact": "Banana, Coconut, Fruits", "level": "med"}, {"name": "Eid al-Adha (Bakrid)", "date": "2026-05-27", "impact": "Onion, Tomato, Mint, Coriander, Banana", "level": "very_high"}, {"name": "Vat Savitri", "date": "2026-06-04", "impact": "Banana, Coconut", "level": "med"}, {"name": "Ganga Dussehra", "date": "2026-06-14", "impact": "Coconut, Banana", "level": "med"}, {"name": "Ashadi Ekadashi", "date": "2026-07-15", "impact": "Banana, Coconut", "level": "med"}, {"name": "Onam (Kerala)", "date": "2026-09-08", "impact": "Banana, Coconut, Vegetables (Sadya)", "level": "high"}, {"name": "Ganesh Chaturthi", "date": "2026-09-14", "impact": "Banana, Coconut, Vegetables", "level": "very_high"}, {"name": "Navratri (Day 1)", "date": "2026-10-11", "impact": "Potato, Banana, Coconut", "level": "very_high"}, {"name": "Diwali", "date": "2026-11-08", "impact": "All vegetables, Coconut, Banana", "level": "very_high"}, {"name": "Karnataka Wedding Season", "date": "2026-05-01_to_2026-06-15", "impact": "Onion, Tomato, Coconut, Potato, Carrot", "level": "very_high"}], "weather_cal": [{"period": "May 2026", "desc": "Pre-monsoon heat peak (35-38\u00b0C). Greens yield \u219325-35%. Cold chain critical."}, {"period": "Jun 1-10 2026", "desc": "SW Monsoon onset over Karnataka coast (~Jun 5). Watermelon demand drops sharply."}, {"period": "Jun-Sep 2026", "desc": "SW Monsoon active. Tomato Kolar belt flood risk Sep-Oct. Cyclone risk on TN/AP coast affects Banana, Coconut, Drumstick rakes."}, {"period": "Jul-Aug 2026", "desc": "Heavy rain windows. Peri-urban greens fungal risk. Onion storage rot risk in MH."}, {"period": "Aug-Sep 2026", "desc": "Nilgiris landslide window \u2014 Carrot Ooty supply at risk."}], "loc_state": {"Hosakote": "Karnataka", "Kolar": "Karnataka", "Chikkaballapur": "Karnataka", "Malur": "Karnataka", "Malur/Sulibele": "Karnataka", "Chimasandra": "Karnataka", "Nelamangala": "Karnataka", "Goravigere": "Karnataka", "Safal": "Karnataka (Safal-Bangalore)", "Near Safal": "Karnataka", "City market": "Karnataka (Bangalore Mandi)", "Binni mill ": "Karnataka (Binny Mills)", "Huskur Market": "Karnataka (Hoskote/Huskur)", "TN": "Tamil Nadu"}};
+const MODE = "supply";
+
+function fmt(n){ return Math.round(n).toLocaleString('en-IN'); }
+
+// Render sparklines
+function renderSparks() {
+    ORDER.forEach((sku, i) => {
+        const id = 'spark-' + MODE + '-' + (i+1);
+        const el = document.getElementById(id);
+        if (!el) return;
+        const d = DATA[sku];
+        const hist = MODE === 'demand' ? d.hist_demand.slice(-12) : d.hist_supply.slice(-12);
+        const fc = MODE === 'demand' ? d.forecast_demand : d.forecast_supply;
+        const labels = hist.map(h=>h.week_start.slice(5)).concat(fc.map(f=>f.week_start.slice(5)));
+        const histVals = hist.map(h=>h.value).concat(Array(fc.length).fill(null));
+        const fcVals = Array(hist.length-1).fill(null).concat([hist[hist.length-1].value]).concat(fc.map(f=>f.value));
+        new Chart(el, {
+            type:'line',
+            data:{
+                labels: labels,
+                datasets:[
+                    {label:'History', data: histVals, borderColor:'#0d3b66', backgroundColor:'rgba(13,59,102,0.06)', fill:true, tension:0.3, pointRadius:0, borderWidth:1.6},
+                    {label:'Forecast', data: fcVals, borderColor:'#d18c00', backgroundColor:'rgba(209,140,0,0.10)', fill:true, tension:0.3, pointRadius:0, borderWidth:1.6, borderDash:[4,3]}
+                ]
+            },
+            options:{
+                plugins:{legend:{display:false},tooltip:{enabled:true,callbacks:{label:c=>fmt(c.parsed.y)}}},
+                scales:{x:{display:false},y:{display:false,beginAtZero:true}},
+                maintainAspectRatio:false,
+                responsive:true
+            }
+        });
+    });
+}
+
+function applyFilters() {
+    const cat = document.getElementById('filter-cat').value;
+    const tier = document.getElementById('filter-tier').value;
+    const trend = document.getElementById('filter-trend').value;
+    const sort = document.getElementById('filter-sort').value;
+    const grid = document.getElementById('grid');
+    let cards = Array.from(grid.querySelectorAll('.card'));
+    cards.forEach(c => {
+        const cm = !cat || c.dataset.cat === cat;
+        const tm = !tier || c.dataset.tier === tier;
+        const g = parseFloat(c.dataset.growth);
+        const trm = !trend || (trend==='up' && g>=5) || (trend==='down' && g<=-5) || (trend==='flat' && g>-5 && g<5);
+        c.style.display = (cm && tm && trm) ? '' : 'none';
+    });
+    if (sort) {
+        cards.sort((a,b)=>{
+            if (sort==='rank') return parseInt(a.querySelector('.rank').textContent.slice(1)) - parseInt(b.querySelector('.rank').textContent.slice(1));
+            if (sort==='growth-desc') return parseFloat(b.dataset.growth) - parseFloat(a.dataset.growth);
+            if (sort==='growth-asc') return parseFloat(a.dataset.growth) - parseFloat(b.dataset.growth);
+            if (sort==='fc-desc') {
+                const av = DATA[a.dataset.sku][MODE==='demand'?'fc_avg_demand':'fc_avg_supply'];
+                const bv = DATA[b.dataset.sku][MODE==='demand'?'fc_avg_demand':'fc_avg_supply'];
+                return bv - av;
+            }
+        });
+        cards.forEach(c => grid.appendChild(c));
+    }
+}
+
+function openDetail(sku) {
+    const d = DATA[sku];
+    const f = d.factors || {};
+    const isDem = MODE === 'demand';
+    const hist = (isDem? d.hist_demand : d.hist_supply).slice(-12);
+    const fc = isDem? d.forecast_demand : d.forecast_supply;
+    const total = (Object.values(d.vendor_locations || {}).reduce((a,b)=>a+b,0)) || 1;
+    const sortedLocs = Object.entries(d.vendor_locations || {}).sort((a,b)=>b[1]-a[1]);
+    const sortedVendors = Object.entries(d.vendors || {}).sort((a,b)=>b[1]-a[1]);
+    const colors = ['#0d3b66','#155e8a','#2d80b1','#5a9fc4','#8cb9d0','#b8d3e2','#ddebf3'];
+    const geoBar = sortedLocs.map(([loc,v],i)=>`<div style="background:${colors[i%7]};width:${(v/total*100).toFixed(1)}%;" title="${loc}: ${fmt(v)} (${(v/total*100).toFixed(1)}%)">${(v/total*100)>=8?loc:''}</div>`).join('');
+
+    let festHtml = '';
+    if (isDem && f.festivals_demand) {
+        festHtml = f.festivals_demand.map(([n,l])=>`<div class="fest-row"><span>${n}</span><span>${l}</span></div>`).join('');
+    }
+
+    let nationalFestHtml = '';
+    if (isDem) {
+        nationalFestHtml = (FACTORS.festival_cal||[]).filter(fe => {
+            const i = (fe.impact||'').toLowerCase();
+            const lower = sku.toLowerCase();
+            return lower.split(/[\s,/()]/).some(t => t.length>3 && i.includes(t)) ||
+              (lower.includes('coriander') && i.includes('coriander')) ||
+              (lower.includes('mint') && (i.includes('mint')||i.includes('pudina'))) ||
+              (lower.includes('tomato') && i.includes('tomato')) ||
+              (lower.includes('banana') && i.includes('banana')) ||
+              (lower.includes('coconut') && i.includes('coconut'));
+        }).map(fe => `<div class="fest-row"><span><b>${fe.name}</b> <span style="color:#7d8a99;">· ${fe.date.replace(/_to_/,' → ')}</span></span><span class="fest-lvl ${fe.level}">${fe.level.replace('_',' ').toUpperCase()}</span></div>`).join('');
+    }
+
+    document.getElementById('modal-body').innerHTML = `
+        <span class="close" onclick="closeDetail()">×</span>
+        <h2>${sku}</h2>
+        <div style="color:#6b7989;font-size:13px;">${d.category} · ${d.tier} Tier · ${d.decision} · 3M demand: ${fmt(d.demand_total_3m)} · Total indent (Jan-Apr): ${fmt(d.supply_total)}</div>
+
+        <section>
+            <h3>${isDem?'Weekly demand — 12-week history + 4-week forecast':'Weekly supply (vendor indent) — 12-week history + 4-week forecast'}</h3>
+            <div class="chart-wrap"><canvas id="detail-chart"></canvas></div>
+        </section>
+
+        ${!isDem ? `
+        <section>
+            <h3>Supply geography (Jan-Apr 2026)</h3>
+            <div class="geo-bar">${geoBar}</div>
+            <div style="font-size:12px;color:#6b7989;">Top sources: ${sortedLocs.slice(0,5).map(([l,v])=>l+' ('+fmt(v)+')').join(' · ')}</div>
+            <div style="margin-top:10px;font-size:12.5px;"><b>Vendors (${sortedVendors.length}):</b> ${sortedVendors.slice(0,4).map(([v,q])=>v+' ('+fmt(q)+')').join(' · ')}</div>
+        </section>
+        ` : `
+        <section>
+            <h3>Festival & event drivers (next 90 days)</h3>
+            ${nationalFestHtml || '<div style="color:#7d8a99;font-size:12.5px;">No major festival driver in window for this SKU.</div>'}
+        </section>
+        `}
+
+        <section>
+            <h3>Factors layered into forecast</h3>
+            <div class="fact-grid">
+                ${f.festivals_demand && isDem ? `<div class="fc"><h4>SKU-specific festival demand</h4>${festHtml}</div>` : ''}
+                ${f.weather ? `<div class="fc"><h4>Weather sensitivity</h4><p>${f.weather}</p></div>` : ''}
+                ${f.harvest_origin ? `<div class="fc"><h4>Harvest origin</h4><ul>${f.harvest_origin.map(o=>'<li>'+o+'</li>').join('')}</ul></div>` : ''}
+                ${f.monsoon_impact ? `<div class="fc"><h4>Monsoon impact</h4><p>${f.monsoon_impact}</p></div>` : ''}
+                ${f.disruption ? `<div class="fc"><h4>Disruption flags</h4><ul>${f.disruption.map(o=>'<li>'+o+'</li>').join('')}</ul></div>` : ''}
+                ${f.fuel_sensitivity ? `<div class="fc"><h4>Fuel / freight sensitivity</h4><p>${f.fuel_sensitivity}</p></div>` : ''}
+            </div>
+        </section>
+
+        ${!isDem ? `<section>
+            <h3>Forecast detail (May 4 - May 31, 2026)</h3>
+            ${fc.map(w => `<div class="alert"><b>Wk ${w.week_start}:</b> ${fmt(w.value)} units · Risks: ${(w.risks||[]).join(', ')||'—'}</div>`).join('')}
+        </section>` : `<section>
+            <h3>Forecast detail (May 4 - May 31, 2026)</h3>
+            ${fc.map(w => `<div class="alert ${(w.festivals||[]).length?'success':''}"><b>Wk ${w.week_start}:</b> ${fmt(w.value)} units · Drivers: ${[(w.festivals||[]).join(', '), w.note].filter(Boolean).join(' · ')||'baseline'}</div>`).join('')}
+        </section>`}
+    `;
+    document.getElementById('modal').classList.add('open');
+    setTimeout(()=>{
+        const ctx = document.getElementById('detail-chart');
+        const labels = hist.map(h=>h.week_start).concat(fc.map(f=>f.week_start));
+        const histVals = hist.map(h=>h.value).concat(Array(fc.length).fill(null));
+        const fcVals = Array(hist.length-1).fill(null).concat([hist[hist.length-1].value]).concat(fc.map(f=>f.value));
+        new Chart(ctx, {
+            type:'line',
+            data:{
+                labels,
+                datasets:[
+                    {label:'History', data:histVals, borderColor:'#0d3b66', backgroundColor:'rgba(13,59,102,0.10)', fill:true, tension:0.3, pointRadius:3, borderWidth:2},
+                    {label:'Forecast', data:fcVals, borderColor:'#d18c00', backgroundColor:'rgba(209,140,0,0.15)', fill:true, tension:0.3, pointRadius:3, borderWidth:2, borderDash:[6,4]}
+                ]
+            },
+            options:{
+                plugins:{legend:{position:'top',labels:{boxWidth:10}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmt(c.parsed.y)}}},
+                scales:{y:{beginAtZero:true,ticks:{callback:v=>fmt(v)}}},
+                responsive:true,
+                maintainAspectRatio:false
+            }
+        });
+    },50);
+}
+function closeDetail(){ document.getElementById('modal').classList.remove('open'); }
+
+document.addEventListener('DOMContentLoaded', renderSparks);
+</script>
+</body></html>
